@@ -3,6 +3,7 @@ import { defineProps } from 'vue';
 
 import ShowCompanys from './showCompanys.vue';
 import ShowTeachers from './showTeachers.vue';
+import ShowContacts from './showContacts.vue';
 
 const props = defineProps({
   section: {
@@ -18,6 +19,7 @@ const props = defineProps({
                 <section class="data">
                   <ShowCompanys v-if="props.section == 'empresas'" />
                   <ShowTeachers v-if="props.section=='profesores'" />
+                  <ShowContacts v-if="props.section=='contactos'" />
                 </section>
 
                </section>
@@ -27,19 +29,12 @@ const props = defineProps({
             height: 100%;
         }
 
-        section.loading,
-        div.noData{
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            gap: 1rem;
-        }
-
         section.data{
             height: 100%;
             width: 100%;
+
+            display: flex;
+            flex-direction: column;
         }
 
 </style>

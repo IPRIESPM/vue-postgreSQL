@@ -57,3 +57,30 @@ div.loading{
 
     animation: loading 1s infinite linear;
 }
+
+.error-message{
+    color: var(--color-error);
+    
+    transition: all 1s;
+    text-align: center;
+    opacity: 0;
+}
+
+.error-message p{
+    height: 35px;
+}
+
+.error-message.show{
+    opacity: 1;
+    transition: all 1s;
+    animation: bounce 0.5s 1 linear forwards;
+}
+
+.rotate{
+    animation: loading 1s infinite linear;
+}
+
+.disabled{
+    opacity: 0.5;
+    pointer-events: none;
+}

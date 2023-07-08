@@ -13,6 +13,11 @@ import {
   faAngleDown,
   faPlus,
   faMinus,
+  faArrowsRotate,
+  faPenToSquare,
+  faTrash,
+  faFloppyDisk,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
 import router from './router';
@@ -27,6 +32,11 @@ library.add(
   faAngleDown,
   faPlus,
   faMinus,
+  faArrowsRotate,
+  faPenToSquare,
+  faTrash,
+  faFloppyDisk,
+  faXmark,
 );
 const app = createApp(App);
 

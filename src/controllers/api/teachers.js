@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-export default async function getAllTeachersFromApi(version) {
+export async function getAllTeachersFromApi(version) {
   const url = 'http://vps-3258627-x.dattaweb.com:8084/api/profesor';
 
   try {
@@ -15,35 +15,31 @@ export default async function getAllTeachersFromApi(version) {
     });
 
     if (response.status === 304) {
-      console.log('No hay cambios en las profesores');
       return 304;
     }
 
     if (!response.ok) {
-      console.log('Error al obtener las profesores');
       return false;
     }
 
-    console.log('Obteniendo las profesores');
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    console.log('Error al obtener las profesores');
     return false;
   }
 }
 
-export async function newCompany(data) {
+export async function newTeacher(data) {
   const {
-    cif, nombre, localidad, comunidad, direccion, telefono,
+    dni, nombre, correo, telefono, contrasena,
   } = data;
-  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/profesores';
+  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/profesor';
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono,
+        dni, nombre, correo, telefono, contrasena,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -52,37 +48,95 @@ export async function newCompany(data) {
     });
 
     if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`);
+      return false;
     }
 
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    throw new Error(`Error en la solicitud al crear una nueva empresa: ${error.message}`);
+    return false;
   }
 }
 
-export async function checkCompanies(version) {
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/version/${version}`;
+export async function updateTeacherFromApi(data) {
+  const {
+    dni, nombre, correo, telefono,
+  } = data;
+
+  const url = `http://vps-3258627-x.dattaweb.com:8084/api/profesor/${dni}`;
 
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: 'PUT',
+      body: JSON.stringify({
+        dni, nombre, correo, telefono,
+      }),
       headers: {
         'Content-Type': 'application/json',
         Authorization: Cookies.get('token'),
-        version,
       },
     });
 
     if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`);
+      return false;
     }
 
     const responseData = await response.json();
     return responseData;
   } catch (error) {
-    console.log('error', error);
-    throw new Error(`Error al comprobar las empresas: ${error.message}`);
+    return false;
   }
+}
+
+export async function deleteTeacherFromApi(dni) {
+  const url = `http://vps-3258627-x.dattaweb.com:8084/api/profesor/${dni}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('token'),
+      },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    return false;
+  }
+}
+
+export async function formatTeacherData(oldData, newData) {
+  const updatedData = [...oldData];
+
+  const oldDataIndex = updatedData.findIndex((item) => item.dni === newData.dni);
+  if (oldDataIndex !== -1) {
+    updatedData[oldDataIndex] = newData;
+  } else {
+    updatedData.push(newData);
+  }
+
+  return updatedData;
+}
+
+export async function deleteLocalTeacherData(oldData, dni) {
+  // copiamos todos los docentes en un nuevo array
+  const updatedData = [...oldData];
+
+  console.log('Todos los docentes', oldData);
+  // Buscamos el indice del docente que queremos eliminar
+  const oldDataIndex = await oldData.findIndex((item) => item.dni === dni);
+  console.log('Indice del docente a eliminar', oldDataIndex);
+
+  // Si el indice es distinto de -1, es decir, si existe el docente
+  if (oldDataIndex !== -1) {
+    updatedData.splice(oldDataIndex, 1);
+  }
+
+  return updatedData;
 }

@@ -64,6 +64,9 @@ nav {
   right: 2.5em;
   width: 200px;
   gap: 0.3em;
+
+  background-color: var(--color-background);
+
   opacity: 0;
   visibility: hidden;
   transition: all 0.8s ease-in-out;

@@ -1,42 +1,93 @@
-export default async function addLocalStorage(data, section) {
-  const name = `${section}Data`;
-  const result = {
-    version: 0,
+export function getLocalStorage(params) {
+  const storageName = `${params}Data`;
+  console.log('getLocalStorage');
+  console.log('params', params);
+  // obtener datos de local storage
+  const localData = JSON.parse(localStorage.getItem(storageName));
+  console.log('localData', localData);
+  console.log('------------------------------------');
+  return localData;
+}
+
+export function createLocalStorageFromApi(params, name) {
+  console.log('createLocalStorageFromApi');
+  console.log('params', params);
+  console.log('name', name);
+
+  const storageName = `${name}Data`;
+  console.log('storageName', storageName);
+
+  const { data, version } = params;
+  console.log('datos', data);
+  console.log('version', version);
+  let validData = data;
+
+  if (!data) validData = [];
+
+  const newLocalData = {
     date: new Date(),
-    datos: [],
+    version,
+    data: [...validData],
   };
-  if (data !== null) {
-    result.datos.push(data);
-  }
-  localStorage.setItem(name, JSON.stringify(result));
-  return result;
+
+  console.log('newLocalData', newLocalData);
+  localStorage.setItem(storageName, JSON.stringify(newLocalData));
 }
 
-function createLocalStorage(section, data) {
-  const name = `${section}Data`;
-  const result = {
-    version: 0,
+export function createLocalStorage(name) {
+  const storageName = `${name}Data`;
+  const localData = {
     date: new Date(),
-    datos: data,
+    version: 0,
+    data: [],
   };
-  localStorage.setItem(name, JSON.stringify(result));
-  return result;
+  console.log('createLocalStorage');
+  localStorage.setItem(storageName, JSON.stringify(localData));
+  return localData;
 }
 
-export async function getLocalStorage(section) {
-  const name = `${section}Data`;
-  const localData = localStorage.getItem(name);
-  if (localData) return JSON.parse(localData);
-  console.log('no local data');
+export function addLocalStorage(params, name) {
+  console.log('addLocalStorage');
+  console.log('params', params);
 
-  return addLocalStorage(null, section);
+  const storageName = `${name}Data`;
+  console.log('storageName', storageName);
+
+  const oldLocalStorage = getLocalStorage(name);
+
+  console.log('datos', oldLocalStorage);
+
+  oldLocalStorage.data.push(params);
+  console.log('datos', oldLocalStorage.data);
+  const newLocalStorage = {
+    date: new Date(),
+    version: oldLocalStorage.version,
+    data: [...oldLocalStorage.data],
+  };
+
+  console.log('newLocalStorage', newLocalStorage);
+
+  localStorage.setItem(storageName, JSON.stringify(newLocalStorage));
 }
 
-export async function remplaceLocalStorage(data, section) {
-  const name = `${section}Data`;
-  if (localStorage.getItem(name)) {
-    localStorage.removeItem(name);
-  }
-  console.log('remplaceLocalStorage', data.datos[0]);
-  createLocalStorage(section, data.datos);
+export function deleteLocalStorage(params, name) {
+  console.log('deleteLocalStorage');
+  console.log('params', params);
+
+  const storageName = `${name}Data`;
+  console.log('storageName', storageName);
+
+  const oldLocalStorage = getLocalStorage(name);
+
+  console.log('datos', oldLocalStorage);
+
+  const newLocalStorage = {
+    date: new Date(),
+    version: oldLocalStorage.version,
+    data: oldLocalStorage.data.filter((item) => item.id !== params),
+  };
+
+  console.log('newLocalStorage', newLocalStorage);
+
+  localStorage.setItem(storageName, JSON.stringify(newLocalStorage));
 }

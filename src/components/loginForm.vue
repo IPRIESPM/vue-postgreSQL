@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 
 import logoSvg from '../assets/svg/Logo.svg';
 import login from '../controllers/session';
+import submitButton from './submitButton.vue';
 
 const router = useRouter();
 const loading = ref(false);
@@ -73,7 +74,7 @@ onMounted(() => {
     <section class="error-message" :class="{ 'error-class': dataError.error }">
       <p v-if="dataError.error">{{ dataError.message }}</p>
     </section>
-    <form @submit="onSubmit">
+    <form @submit.prevent="onSubmit" id="logging">
 
       <fieldset>
         <label for="dni">DNI del usuario</label>
@@ -84,8 +85,18 @@ onMounted(() => {
         <input type="password" name="contrasena" id="password" placeholder="********" required>
       </fieldset>
 
-      <input v-if="loading" type="submit" value="Cargando" disabled="disabled">
-      <input v-else type="submit" value="Acceder">
+      <submitButton
+        :loading="loading"
+        idleText="Acceder"
+        loadingText="Iniciando"
+        @click="submitForm"
+      />
+
+      <!-- <button v-if="loading" type="button" class="loading">
+        <span>Iniciando</span>
+        <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
+      </button>
+      <input v-else type="submit" value="Acceder"> -->
     </form>
   </section>
 </template>

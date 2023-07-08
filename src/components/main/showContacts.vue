@@ -86,14 +86,15 @@
                 v-model.lazy="dataSelected.nombre"
               >
             </fieldset>
-            <fieldset v-if="modalOption !== 'edit'">
-              <label for="contrasena">Contraseña</label>
+            <fieldset>
+              <label for="correo">Correo electrónico</label>
               <input
-                type="password"
-                name="contrasena"
-                id="contrasena"
-                placeholder="*******"
+                type="text"
+                name="correo"
+                id="correo"
+                placeholder="example@example.com"
                 required
+                v-model.lazy="dataSelected.correo"
               >
             </fieldset>
           </section>
@@ -109,16 +110,36 @@
                 v-model.lazy="dataSelected.telefono"
               >
             </fieldset>
+
             <fieldset>
-              <label for="correo">Correo electrónico</label>
-              <input
-                type="text"
-                name="correo"
-                id="correo"
-                placeholder="example@example.com"
-                required
-                v-model.lazy="dataSelected.correo"
-              >
+              <label for="tipo">Tipo</label>
+              <select name="tipo" id="tipo">
+                <option value="gerente">Gerente</option>
+                <option value="jefe-proyecto">Jefe de proyecto</option>
+                <option value="tecnico">Técnico</option>
+                <option value="tutor">Tutor</option>
+                <option value="rrhh">RRHH</option>
+              </select>
+            </fieldset>
+
+            <fieldset>
+              <label for="principal"></label>
+              <p><input type="checkbox" name="principal" id="principal"> Principal</p>
+            </fieldset>
+            <fieldset>
+              <label for="empresa">Empresa</label>
+              <select name="company" id="company">
+                <option v-for="company in companies" :key="company.cif" >
+                 {{ company.nombre  }}
+                </option>
+              </select>
+            </fieldset>
+
+          </section>
+          <section class="contact">
+            <fieldset>
+              <label for="funciones">Funciones</label>
+              <textarea name="" id="" cols="87" rows="10"></textarea>
             </fieldset>
           </section>
           <section class="buttons">
@@ -145,8 +166,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { getAllData, editData, deleteData } from '../../controllers/data';
-import { addLocalStorage } from '../../controllers/localStorage';
-import { newTeacher } from '../../controllers/api/teachers';
+import { addLocalStorage, getLocalStorage } from '../../controllers/localStorage';
+import { newContact } from '../../controllers/api/contacts';
 import submitButton from '../submitButton.vue';
 import { getUserLocalStorage } from '../../controllers/session';
 
@@ -157,6 +178,8 @@ const updating = ref(false);
 const localData = ref([]);
 const newData = ref(false);
 const dataSelected = ref({});
+
+const companies = ref([]);
 
 const submitError = ref(false);
 const submitLoading = ref(false);
@@ -171,7 +194,7 @@ async function updateData(force = false) {
   if (force) {
     console.log('Forzando actualización de datos');
   }
-  const dataUpdated = await getAllData('teachers', force);
+  const dataUpdated = await getAllData('contacts', force);
 
   localData.value = dataUpdated.data;
   loading.value = false;
@@ -184,14 +207,14 @@ function editFormData(id) {
     edit.value = id;
     modal.value = true;
     modalOption.value = 'edit';
-    dataSelected.value = localData.value.find((teacher) => teacher.dni === id);
+    dataSelected.value = localData.value.find((contact) => contact.dni === id);
   }
 }
 
 async function deleteFormData(id) {
   console.log('Eliminando: ', id);
   loading.value = true;
-  const dataUpdated = await deleteData('teachers', id);
+  const dataUpdated = await deleteData('contacts', id);
   console.log('data: ', dataUpdated.data);
   if (!dataUpdated.data) localData.value = [];
   localData.value = dataUpdated.data;
@@ -220,26 +243,26 @@ const onSubmit = async (event) => {
   let responseData;
 
   if (modalOption.value === 'edit') {
-    responseData = await editData('teachers', data);
+    responseData = await editData('contacts', data);
     console.log('responseData:', responseData);
     if (responseData) {
       localData.value = responseData.data;
       event.target.classList.add('bounce');
-      errorMessage.value = 'Error al Actualizar al docente';
+      errorMessage.value = 'Error al Actualizar al contacto';
       modal.value = false;
     }
     submitLoading.value = false;
   } else {
-    responseData = await newTeacher(data);
+    responseData = await newContact(data);
     if (responseData) {
       localData.value.push(responseData);
       console.log('responseData:', responseData);
-      await addLocalStorage(responseData, 'teachers');
+      await addLocalStorage(responseData, 'contacts');
       newData.value = false;
       submitLoading.value = false;
       modal.value = false;
     } else {
-      errorMessage.value = 'Error al añadir al docente';
+      errorMessage.value = 'Error al añadir al contacto';
       submitError.value = true;
       submitLoading.value = false;
       loading.value = false;
@@ -257,6 +280,9 @@ onMounted(async () => {
       submitError.value = false;
     });
   });
+  const data = getLocalStorage('companys');
+  console.log('data:', data.data);
+  companies.value = data.data;
 });
 </script>
 
@@ -303,7 +329,7 @@ button.add {
 
 button.add.variant {
     position: relative;
-    top: -180px;
+    top: -310px;
     border-radius: 100%;
     outline: none;
     border: none;
@@ -360,11 +386,13 @@ form{
     section.contact{
         display: flex;
         flex-direction: row;
+        justify-content: space-around;
     }
     section.personal fieldset,
     section.contact fieldset{
         display: flex;
         flex-direction: column;
+        justify-content: center;
         gap: 0.5rem;
     }
     section.buttons{
