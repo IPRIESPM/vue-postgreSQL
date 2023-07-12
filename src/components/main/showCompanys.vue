@@ -1,181 +1,217 @@
 <template>
     <header>
-        <button
-            class="update"
-            @click="updateButton"
-            :class="{'disable' : updating}"
-        >
-            <p>Actualizar</p>
-            <p :class="{ 'rotate': updating }">
-                <font-awesome-icon :icon="['fas', 'arrows-rotate']" />
-            </p>
-        </button>
+      <button
+        class="update"
+        @click="updateButton"
+        :class="{ 'disable': updating }"
+      >
+        <p>Actualizar</p>
+        <p :class="{ 'rotate': updating }">
+          <font-awesome-icon :icon="['fas', 'arrows-rotate']" />
+        </p>
+      </button>
     </header>
     <section class="loading" v-if="loading">
-        Cargando <div class="loading"></div>
+      Cargando <div class="loading"></div>
     </section>
-    <section class="tableData" v-else-if="localData && localData.length">
-        <table>
-            <thead>
-                <tr>
-                    <th>Empresa</th>
-                    <th>Profesor encargado</th>
-                    <th>Localidad</th>
-                    <th>Vacantes</th>
-                    <th>Ciclos</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="company in localData" :key="company.cif">
-                    <td :class="{ 'empty': !company.nombre }">
-                        <span>
-                            {{ company.nombre }}
-                        </span>
-                    </td>
-                    <td :class="{ 'empty': !company.nombre_contacto }">
-                        <span> {{ company.nombre_contacto ? company.nombre_contacto : '-' }} </span>
-                    </td>
-                    <td :class="{ 'empty': !company.localidad }">
+    <section class="tableData" v-else-if="localData.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Profesor Encargado</th>
+            <th>Localidad</th>
+            <th class="empty">Vacantes</th>
+            <th class="empty">Ciclos</th>
+            <th class="empty">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr v-for="company in localData" :key="company.cif">
+              {{ company[0]  }}
+            <td :class="{ 'empty': !company.nombre }" @click="goProfile(company.cif)">
 
-                        <span>
-                            {{ company.localidad }}
-                        </span>
-
-                    </td>
-                    <td :class="{ 'empty': !company.vacantes }">
-                        <span> {{ company.vacantes ? company.vacantes : '-' }} </span>
-                    </td>
-                    <td :class="{ 'empty': !company.puestos }">
-                        <span> {{ company.puestos ? company.puestos : '-' }} </span>
-                    </td>
-                    <td class="icons">
-                        <font-awesome-icon
-                            :icon="['fas', 'pen-to-square']"
-                            @click="editFormData(company.cif)"
-                        />
-                        <font-awesome-icon
-                        :icon="['fas', 'trash']"
-                        @click="deleteFormData(company.cif)"
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+              <span>
+                <font-awesome-icon :icon="['fas', 'address-card']" />
+                {{ company.nombre }}
+              </span>
+            </td>
+            <td>
+              <span>{{ company.nombre_profesor ? company.nombre_profesor : '-' }}</span>
+            </td>
+            <td :class="{ 'empty': !company.localidad }">
+              <span>{{ company.localidad }}</span>
+            </td>
+            <td :class="{ 'empty': !company.vacantes }">
+              <span>{{ company.vacantes ? company.vacantes : '-' }}</span>
+            </td>
+            <td :class="{ 'empty': !company.ciclos }">
+              <span>{{ company.ciclos ? company.ciclos : '-' }}</span>
+            </td>
+            <td class="icons">
+              <font-awesome-icon
+                :icon="['fas', 'pen-to-square']"
+                @click="editFormData(company.cif)"
+              />
+              <font-awesome-icon
+                :icon="['fas', 'trash']"
+                @click="deleteFormData(company.cif)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </section>
     <section class="noData" v-else>
-        <p>No hay datos 😢</p>
+      <p>No hay datos 😢</p>
     </section>
-    <section class="modal" :class="{ 'is-active': modal }" >
-        <form id="modalForm" @submit.prevent="onSubmit">
+    <section class="modal" :class="{ 'is-active': modal }">
+      <form id="modalForm" @submit.prevent="onSubmit">
+        <h3>{{ modalOption === 'edit' ? 'Editando' : 'Nuevo' }}</h3>
+        <section class="error-message" :class="{ 'show': submitError }">
+          <p>{{ errorMessage }}</p>
+        </section>
+        <section class="container">
+          <section class="personal">
+            <fieldset>
+              <label for="dni">Cif</label>
+              <input
+                type="text"
+                name="cif"
+                id="cif"
+                placeholder="A12345678"
+                v-model="dataSelected.cif"
+                required
+              >
+            </fieldset>
+            <fieldset>
+              <label for="nombre">Nombre</label>
+              <input
+                type="text"
+                name="nombre"
+                id="nombre"
+                placeholder="Empresa S.L."
+                required
+                v-model="dataSelected.nombre"
+              >
+            </fieldset>
+            <fieldset>
+              <label for="telefono">Telefono</label>
+              <input
+                type="tel"
+                name="telefono"
+                id="telefono"
+                placeholder="965331234"
+                required
+                v-model="dataSelected.telefono"
+              >
+            </fieldset>
+          </section>
+          <section class="contact">
+            <fieldset>
+              <label for="direccion">Direccion</label>
+              <input
+                type="text"
+                name="direccion"
+                id="direccion"
+                placeholder="Calle de la piruleta, 123"
+                required
+                v-model="dataSelected.direccion"
+              >
+            </fieldset>
 
-            <h3>{{ modalOption === 'edit' ? 'Editando empresa' : 'Nueva empresa' }}</h3>
-            <section class="error-message" :class="{ 'show': submitError }">
-                <p>{{ errorMessage }}</p>
-            </section>
-            <section class="container">
-                <section class="personal">
-                    <fieldset>
-                        <label for="cif">Cif</label>
-                        <input
-                            type="text"
-                            name="cif"
-                            id="cif"
-                            placeholder="A12345678"
-                            v-model="dataSelected.cif "
-                            required
-                        >
+            <fieldset>
+              <label for="localidad">Localidad</label>
+              <input
+                type="text"
+                name="localidad"
+                id="localidad"
+                placeholder="Petrer"
+                required
+                v-model="dataSelected.localidad"
+              >
+            </fieldset>
+            <fieldset>
+              <label for="comunidad">Comunidad</label>
+              <input
+                type="text"
+                name="comunidad"
+                id="comunidad"
+                placeholder="Alicante"
+                required
+                v-model="dataSelected.comunidad"
+              >
+            </fieldset>
 
-                    </fieldset>
-                    <fieldset>
-                        <label for="nombre">Nombre</label>
-                            <input
-                                type="text"
-                                name="nombre"
-                                id="nombre"
-                                placeholder="Teralco"
-                                required
-                                v-model="dataSelected.nombre"
-                            >
-                    </fieldset>
-                    <fieldset>
-                        <label for="telefono">Telefono</label>
-                        <input
-                            type="tel"
-                            name="telefono"
-                            id="telefono"
-                            placeholder="965331234"
-                            required
-                            v-model="dataSelected.telefono"
-                        >
-                    </fieldset>
-                </section>
-                <section class="contact">
-                    <fieldset>
-                        <label for="direccion">Direccion</label>
-                        <input
-                            type="text"
-                            name="direccion"
-                            id="direccion"
-                            placeholder="calle"
-                            required
-                            v-model="dataSelected.direccion"
-                        >
-                    </fieldset>
-                    <fieldset>
-                        <label for="localidad">Localidad</label>
-                        <input
-                            type="text"
-                            name="localidad"
-                            id="localidad"
-                            placeholder="Alcoy"
-                            required
-                            v-model="dataSelected.localidad"
-                        >
-                    </fieldset>
-                    <fieldset>
-                        <label for="comunidad">Comunidad</label>
-                        <input
-                            type="text"
-                            name="comunidad"
-                            id="comunidad"
-                            placeholder="Alicante"
-                            v-model="dataSelected.comunidad"
-                            required
-                        >
-                    </fieldset>
-
-                </section>
-                <section class="buttons">
-                    <submitButton
-                        :loading="submitLoading"
-                        idleText="Guardar"
-                        loadingText="Cargando"
-                    />
-                </section>
-            </section>
-        </form>
-        <button type="button" class="add variant" @click="buttonAdd">
-            <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
-            <font-awesome-icon v-else :icon="['fas', 'plus']" />
-        </button>
-</section>
-
-<button type="button" class="add" @click="buttonAdd">
-  <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
-  <font-awesome-icon v-else :icon="['fas', 'plus']" />
-</button>
-
-</template>
+          </section>
+          <section class="contrasena" v-if="modalOption == 'edit'">
+            <fieldset>
+              <label for="contrasena">Contraseña</label>
+              <input
+                  type="password"
+                  name="contrasena"
+                  id="contrasena"
+                  placeholder="*******"
+                >
+            </fieldset>
+          </section>
+          <section>
+            <fieldset>
+              <label for="profesor">Profesor a cargo</label>
+              <select name="profesor" id="profesor">
+                <option :value="teacher.dni"
+                  v-for="teacher in teachersData"
+                  :key="teacher.dni"
+                  :selected="teacher.dni === storedUser.dni">
+                    {{ teacher.nombre }}
+                  </option>
+              </select>
+            </fieldset>
+          </section>
+          <section class="buttons">
+            <submitButton
+              :loading="submitLoading"
+              idleText="Guardar"
+              loadingText="Cargando"
+            />
+          </section>
+        </section>
+      </form>
+      <button type="button" class="add variant" @click="buttonAdd">
+        <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
+        <font-awesome-icon v-else :icon="['fas', 'plus']" />
+      </button>
+    </section>
+    <button type="button" class="add" @click="buttonAdd">
+      <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
+      <font-awesome-icon v-else :icon="['fas', 'plus']" />
+    </button>
+  </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+
+import { useRouter } from 'vue-router';
 import { getAllData, editData, deleteData } from '../../controllers/data';
 import { newCompany } from '../../controllers/api/companys';
 import submitButton from '../submitButton.vue';
+import profesoresStore from '../../store/profesores';
+import companyStore from '../../store/empresas';
+import userStore from '../../store/user';
+import profileStore from '../../store/perfilEmpresa';
+
+const router = useRouter();
+const companyStored = companyStore();
+const userStored = userStore();
+const teacherStored = profesoresStore();
+const profileStored = profileStore();
+
+const storedUser = ref({});
 
 const loading = ref(true);
 const updating = ref(false);
 const localData = ref([]);
+const teachersData = ref([]);
 const newData = ref(false);
 const dataSelected = ref({});
 
@@ -192,9 +228,10 @@ async function updateData(force = false) {
   if (force) {
     console.log('Forzando actualización de datos');
   }
-  const dataUpdated = await getAllData('companys', force);
-
-  localData.value = dataUpdated.data;
+  await getAllData('companys', force);
+  console.log('Actualizando datos');
+  console.log('los datos son:', companyStored.getEmpresas.listado);
+  localData.value = companyStored.getEmpresas.listado;
   loading.value = false;
 }
 
@@ -205,17 +242,15 @@ function editFormData(id) {
     edit.value = id;
     modal.value = true;
     modalOption.value = 'edit';
-    dataSelected.value = localData.value.find((company) => company.cif === id);
+    dataSelected.value = { ...localData.value.find((company) => company.cif === id) };
   }
 }
 
 async function deleteFormData(id) {
   console.log('Eliminando: ', id);
   loading.value = true;
-  const dataUpdated = await deleteData('companys', id);
-  console.log('data: ', dataUpdated);
-  if (!dataUpdated.data) localData.value = [];
-  localData.value = dataUpdated.data;
+  await deleteData('companys', id);
+  await updateData();
   loading.value = false;
 }
 
@@ -229,6 +264,9 @@ const buttonAdd = () => {
   modal.value = !modal.value;
   if (modal.value) {
     modalOption.value = 'add';
+    dataSelected.value = {};
+    getAllData('teachers', 'force');
+    teachersData.value = teacherStored.getProfesores.listado;
   }
 };
 
@@ -243,30 +281,38 @@ const onSubmit = async (event) => {
   if (modalOption.value === 'edit') {
     responseData = await editData('companys', data);
     if (responseData) {
-      localData.value = responseData.data;
       event.target.classList.add('bounce');
-      errorMessage.value = 'Error al Actualizar la empresa';
+      errorMessage.value = 'Error al Actualizar';
       modal.value = false;
     }
     submitLoading.value = false;
   } else {
     responseData = await newCompany(data);
     if (responseData) {
-      localData.value.push(responseData);
-      console.log('responseData: ', responseData);
       newData.value = false;
       submitLoading.value = false;
+      await updateData();
       modal.value = false;
     } else {
-      errorMessage.value = 'Error al añadir la empresa';
+      errorMessage.value = 'Error al añadir';
       submitError.value = true;
       submitLoading.value = false;
+      loading.value = false;
       event.target.classList.add('bounce');
     }
   }
 };
 
+const goProfile = (cif) => {
+  console.log('cif: ', cif);
+  profileStored.selectEmpresa(cif);
+  console.log('La empresa seleccionada es:', profileStored.getEmpresaSelected);
+  router.push({ name: 'empresa' });
+};
+
 onMounted(async () => {
+  storedUser.value = await userStored.getUser;
+
   await updateData();
   const formInputs = document.querySelectorAll('#modalForm input:not([type="submit"])');
   formInputs.forEach((input) => {
@@ -278,164 +324,188 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
 section.tableData {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 section.tableData table thead {
-    color: var(--color-text-muted);
-    text-align: left;
-    margin-bottom: 0.5rem;
-    /* Add margin-bottom to create space */
+  color: var(--color-text-muted);
+  text-align: left;
+  margin-bottom: 0.5rem;
+  /* Add margin-bottom to create space */
 }
 
 table thead th {
-    font-weight: inherit;
-    border-bottom: 1px solid var(--color-text-muted);
-    text-align: left;
+  font-weight: inherit;
+  border-bottom: 1px solid var(--color-text-muted);
+  text-align: left;
 }
 
 section.tableData table tbody td {
-    color: var(--color-text-muted);
-    border-bottom: 1px solid var(--color-text-muted);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-text-muted);
 }
 
 button.add {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
 
-    width: 50px;
-    height: 52px;
+  width: 50px;
+  height: 52px;
 
-    border-radius: 100%;
-    outline: none;
-    border: none;
+  border-radius: 100%;
+  outline: none;
+  border: none;
+
+  background-color: var(--color-background-soft);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 button.add.variant {
-    position: relative;
-    top: -180px;
-    border-radius: 100%;
-    outline: none;
-    border: none;
+  position: relative;
+  top: -259px;
+  border-radius: 100%;
+  outline: none;
+  border: none;
+
+  background-color: var(--color-background);
 }
-header{
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
+
+header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
 }
-button.update{
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    border: none;
-    outline: none;
-    background-color: transparent;
+
+button.update {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border: none;
+  outline: none;
+  background-color: transparent;
 
 }
+
 section.modal {
-    position: fixed;
-    display: none;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 
 }
 
 section.modal.is-active {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-form{
-        width: max-content;
-        padding: 15px;
-        background: var(--color-background-soft);
+form {
+  width: max-content;
+  padding: 15px;
+  background: var(--color-background-soft);
 
-        border: 1px solid black;
-        border-radius: 5px;
-    }
+  border: 1px solid black;
+  border-radius: 5px;
+}
 
-    section.container{
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    section.personal,
-    section.contact{
-        display: flex;
-        flex-direction: row;
-    }
-    section.personal fieldset,
-    section.contact fieldset{
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    section.buttons{
-        display: flex;
-        justify-content: space-between;
-        align-self: center;
-    }
+section.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-    section.buttons input[type="button"]{
-        background-color: aliceblue;
-    }
-    section.loading,
-    section.noData{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-    }
+section.personal,
+section.contact{
+  display: flex;
+  flex-direction: row;
+}
+section.contrasena{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+section.personal fieldset,
+section.contact fieldset,
+section.contrasena fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-    section.noData{
-        height: 100%;
-    }
-    td{
-        height: 30px;
-    }
-    td.icons{
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-    td.empty{
-        color: var(--color-text-muted);
-        text-align: center;
-    }
-    td span{
-        width: 100%;
-    }
-    td input{
-        width: 100%;
-        height: 100%;
-        border: none;
-        outline: none;
-        background-color: transparent;
-        padding: 0;
-        font-size: inherit;
-        color: inherit;
-        border-bottom: 1px solid var(--color-text-muted);
-    }
-    section.editZone{
-        display: flex;
-        gap: 1rem;
-    }
-    .bounce{
-          animation: bounce 0.5s 1 linear forwards;
-        }
+section.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-self: center;
+}
+
+section.buttons input[type="button"] {
+  background-color: aliceblue;
+}
+
+section.loading,
+section.noData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+section.noData {
+  height: 100%;
+}
+
+td {
+  height: 30px;
+}
+
+td.icons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+td.empty,
+th.empty {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+td span {
+  width: 100%;
+}
+
+td input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-bottom: 1px solid var(--color-text-muted);
+}
+
+section.editZone {
+  display: flex;
+  gap: 1rem;
+}
+
+.bounce {
+  animation: bounce 0.5s 1 linear forwards;
+}
 
 </style>

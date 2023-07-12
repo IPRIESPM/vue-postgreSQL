@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-            <tr v-for="teacher in localData" :key="teacher.cif">
+            <tr v-for="teacher in localData" :key="teacher.dni">
               {{ teacher[0]  }}
             <td :class="{ 'empty': !teacher.nombre }">
               <span>

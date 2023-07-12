@@ -15,8 +15,10 @@ import {
 
 export async function getAllData(section, force = false) {
   const localData = getLocalData(section);
-  const { version } = localData;
-  console.log('version', version);
+
+  const { version, listado } = localData;
+  let update = false;
+  if (!listado.length > 0) update = true;
   const date = new Date(localData.date);
 
   const now = new Date();
@@ -25,7 +27,7 @@ export async function getAllData(section, force = false) {
 
   const minutes = Math.floor(diff / 1000 / 60);
 
-  if (minutes < 5 && !force) return localData;
+  if (minutes < 5 && !force && !update) return localData;
   if (force) console.log('update forced');
 
   let data;

@@ -35,6 +35,11 @@ const router = createRouter({
       name: 'perfil',
       component: DashboardView,
     },
+    {
+      path: '/empresa',
+      name: 'empresa',
+      component: DashboardView,
+    },
   ],
 });
 

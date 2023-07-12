@@ -31,15 +31,16 @@ export default async function getAllCompanysFromApi(version) {
 
 export async function newCompany(data) {
   const {
-    cif, nombre, localidad, comunidad, direccion, telefono,
+    cif, nombre, localidad, comunidad, direccion, telefono, profesor,
   } = data;
+
   const url = 'http://vps-3258627-x.dattaweb.com:8084/api/empresa';
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono,
+        cif, nombre, localidad, comunidad, direccion, telefono, profesor,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -114,26 +115,4 @@ export async function deleteCompanyFromApi(cif) {
   } catch (error) {
     return false;
   }
-}
-
-export async function formatCompanyData(oldData, newData) {
-  const updatedData = [...oldData];
-
-  const oldDataIndex = await oldData.findIndex((item) => item.cif === newData.cif);
-  if (oldDataIndex !== -1) {
-    updatedData[oldDataIndex] = newData;
-  } else {
-    updatedData.push(newData);
-  }
-
-  return updatedData;
-}
-export async function deleteLocalCompanyData(oldData, cif) {
-  const updatedData = [...oldData];
-  const oldDataIndex = await oldData.findIndex((item) => item.cif === cif);
-
-  if (oldDataIndex !== -1) {
-    updatedData.splice(oldDataIndex, 1);
-  }
-  return updatedData;
 }

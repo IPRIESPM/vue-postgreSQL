@@ -10,6 +10,7 @@ import router from './router';
 import App from './App.vue';
 
 library.add(
+  solidIcons.faBuilding,
   solidIcons.faMobile,
   solidIcons.faEnvelope,
   solidIcons.faAddressCard,

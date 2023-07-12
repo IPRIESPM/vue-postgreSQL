@@ -16,6 +16,7 @@ onBeforeMount(() => {
     tokenValidate.value = true;
   }
 });
+
 </script>
 <template>
     <section class="dashboard" v-if="tokenValidate">

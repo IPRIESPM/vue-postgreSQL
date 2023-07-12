@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
-export async function getAllTeachersFromApi(version) {
-  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/profesor';
+export default async function getCompanyProfile(cif) {
+  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
 
   try {
     const response = await fetch(url, {
@@ -9,8 +9,6 @@ export async function getAllTeachersFromApi(version) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: Cookies.get('token'),
-        version,
-        table: 'profesores',
       },
     });
 
@@ -29,17 +27,18 @@ export async function getAllTeachersFromApi(version) {
   }
 }
 
-export async function newTeacher(data) {
+export async function newCompany(data) {
   const {
-    dni, nombre, correo, telefono, contrasena,
+    cif, nombre, localidad, comunidad, direccion, telefono, profesor,
   } = data;
-  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/profesor';
+
+  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/empresa';
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        dni, nombre, correo, telefono, contrasena,
+        cif, nombre, localidad, comunidad, direccion, telefono, profesor,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -58,18 +57,23 @@ export async function newTeacher(data) {
   }
 }
 
-export async function updateTeacherFromApi(data) {
+export async function updateCompanyFromApi(data) {
   const {
-    dni, nombre, correo, telefono,
+    cif,
+    nombre,
+    localidad,
+    comunidad,
+    direccion,
+    telefono,
   } = data;
 
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/profesor/${dni}`;
+  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
 
   try {
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
-        dni, nombre, correo, telefono,
+        cif, nombre, localidad, comunidad, direccion, telefono,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -88,8 +92,8 @@ export async function updateTeacherFromApi(data) {
   }
 }
 
-export async function deleteTeacherFromApi(dni) {
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/profesor/${dni}`;
+export async function deleteCompanyFromApi(cif) {
+  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
 
   try {
     const response = await fetch(url, {
