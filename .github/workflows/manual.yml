@@ -31,4 +31,4 @@ jobs:
           
       - name: Deploy to VPS
         run: |
-          ssh -p 5780 isaac@vps-3258627-x.dattaweb.com "cd proyects/vue-postgreSQL/ && git pull origin main && npm install && npm run dev"
+          ssh -p 5780 ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "cd proyects/vue-postgreSQL/ && git pull origin main && npm install && npm run dev"
