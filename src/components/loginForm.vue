@@ -2,6 +2,7 @@
 import Cookies from 'js-cookie';
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
+import userStore from '../store/user';
 
 import logoSvg from '../assets/svg/Logo.svg';
 import login from '../controllers/session';
@@ -10,6 +11,7 @@ import submitButton from './submitButton.vue';
 const router = useRouter();
 const loading = ref(false);
 const dataError = ref({ error: false });
+const storedUser = userStore();
 
 const onSubmit = async (event) => {
   event.preventDefault();
@@ -27,9 +29,10 @@ const onSubmit = async (event) => {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
     const loginData = await login(data);
-
+    console.log(loginData, 'loginData');
     await Cookies.set('token', loginData.token, { expires: 7 });
-    await localStorage.setItem('userData', JSON.stringify(loginData.user));
+    storedUser.setUser(loginData.user);
+    console.log('storedUser', storedUser.getUser);
     router.push({ name: 'dashboard' });
   } catch (error) {
     if (error.message.includes('401 Unauthorized')) {

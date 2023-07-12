@@ -30,6 +30,11 @@ const router = createRouter({
       name: 'contactos',
       component: DashboardView,
     },
+    {
+      path: '/perfil',
+      name: 'perfil',
+      component: DashboardView,
+    },
   ],
 });
 

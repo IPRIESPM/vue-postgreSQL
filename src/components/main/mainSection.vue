@@ -3,7 +3,7 @@ import { defineProps } from 'vue';
 
 import ShowCompanys from './showCompanys.vue';
 import ShowTeachers from './showTeachers.vue';
-import ShowContacts from './showContacts.vue';
+import UserProfile from './userProfile.vue';
 
 const props = defineProps({
   section: {
@@ -19,7 +19,7 @@ const props = defineProps({
                 <section class="data">
                   <ShowCompanys v-if="props.section == 'empresas'" />
                   <ShowTeachers v-if="props.section=='profesores'" />
-                  <ShowContacts v-if="props.section=='contactos'" />
+                  <UserProfile v-if="props.section=='perfil'" />
                 </section>
 
                </section>

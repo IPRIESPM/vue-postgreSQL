@@ -19,11 +19,10 @@
             <thead>
                 <tr>
                     <th>Empresa</th>
-                    <th>Contacto</th>
+                    <th>Profesor encargado</th>
                     <th>Localidad</th>
                     <th>Vacantes</th>
-                    <th>Puestos</th>
-                    <th>Opciones</th>
+                    <th>Ciclos</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,7 +81,7 @@
                             name="cif"
                             id="cif"
                             placeholder="A12345678"
-                            :value="modalOption === 'edit' ? dataSelected.cif : ''"
+                            v-model="dataSelected.cif "
                             required
                         >
 
@@ -95,7 +94,7 @@
                                 id="nombre"
                                 placeholder="Teralco"
                                 required
-                                :value="dataSelected.nombre "
+                                v-model="dataSelected.nombre"
                             >
                     </fieldset>
                     <fieldset>
@@ -106,7 +105,7 @@
                             id="telefono"
                             placeholder="965331234"
                             required
-                            :value="dataSelected.telefono"
+                            v-model="dataSelected.telefono"
                         >
                     </fieldset>
                 </section>
@@ -119,7 +118,7 @@
                             id="direccion"
                             placeholder="calle"
                             required
-                            :value="dataSelected.direccion "
+                            v-model="dataSelected.direccion"
                         >
                     </fieldset>
                     <fieldset>
@@ -130,7 +129,7 @@
                             id="localidad"
                             placeholder="Alcoy"
                             required
-                            :value="dataSelected.localidad"
+                            v-model="dataSelected.localidad"
                         >
                     </fieldset>
                     <fieldset>
@@ -140,7 +139,7 @@
                             name="comunidad"
                             id="comunidad"
                             placeholder="Alicante"
-                            :value="dataSelected.comunidad"
+                            v-model="dataSelected.comunidad"
                             required
                         >
                     </fieldset>
@@ -171,7 +170,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { getAllData, editData, deleteData } from '../../controllers/data';
-import { addLocalStorage } from '../../controllers/localStorage';
 import { newCompany } from '../../controllers/api/companys';
 import submitButton from '../submitButton.vue';
 
@@ -256,7 +254,6 @@ const onSubmit = async (event) => {
     if (responseData) {
       localData.value.push(responseData);
       console.log('responseData: ', responseData);
-      addLocalStorage(responseData, 'companys');
       newData.value = false;
       submitLoading.value = false;
       modal.value = false;

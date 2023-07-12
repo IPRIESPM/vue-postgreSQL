@@ -2,11 +2,14 @@
 import { ref, onMounted } from 'vue';
 import Cookie from 'js-cookie';
 import { useRouter } from 'vue-router';
-import { getUserLocalStorage } from '../controllers/session';
+import userStore from '../store/user';
 
 const router = useRouter();
 const navVisible = ref(false);
 const user = ref(null);
+
+const Store = userStore();
+
 const showOptions = () => {
   navVisible.value = !navVisible.value;
 };
@@ -14,19 +17,19 @@ const showOptions = () => {
 const destroyCookie = () => {
   Cookie.remove('token');
   console.log('Cookie destroyed');
-  localStorage.removeItem('user');
-  console.log('User removed from localStorage');
   router.push({ name: 'home' });
 };
 
 onMounted(async () => {
-  const storedUser = await getUserLocalStorage();
-  if (storedUser) {
-    user.value = storedUser;
-    console.log(JSON.stringify({ nombre: user.value.nombre, telefono: user.value.telefono }));
-  }
+  const storedUser = Store.getUser;
+  console.log(storedUser);
+  user.value = storedUser;
 });
 
+const navigateTo = (route) => {
+  console.log(route);
+  router.push({ name: route });
+};
 </script>
 
 <template>
@@ -35,7 +38,7 @@ onMounted(async () => {
       <span>{{ user.nombre }}</span>
       <font-awesome-icon :icon="['fas', 'angle-down']" />
       <nav :class="{ 'show-nav': navVisible }">
-        <a>Perfil</a>
+        <a @click="navigateTo('perfil')">Perfil</a>
         <a @click="destroyCookie">Cerrar Sesión</a>
       </nav>
     </button>

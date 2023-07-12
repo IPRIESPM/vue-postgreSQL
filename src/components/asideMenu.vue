@@ -31,10 +31,6 @@ const navigateTo = (route) => {
                 <p><font-awesome-icon :icon="['fas', 'user-graduate']" /></p>
                 <p>profesores</p>
             </a>
-            <a href="#" @click="navigateTo('contactos')">
-                <p><font-awesome-icon :icon="['fas', 'address-card']" /></p>
-                <p>contactos</p>
-            </a>
         </nav>
     </aside>
 </template>
@@ -62,7 +58,7 @@ const navigateTo = (route) => {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 3em;
+        gap: 2.2em;
 
         width: 100%;
     }

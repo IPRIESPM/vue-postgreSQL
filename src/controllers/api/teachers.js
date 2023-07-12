@@ -125,18 +125,5 @@ export async function formatTeacherData(oldData, newData) {
 }
 
 export async function deleteLocalTeacherData(oldData, dni) {
-  // copiamos todos los docentes en un nuevo array
-  const updatedData = [...oldData];
-
-  console.log('Todos los docentes', oldData);
-  // Buscamos el indice del docente que queremos eliminar
-  const oldDataIndex = await oldData.findIndex((item) => item.dni === dni);
-  console.log('Indice del docente a eliminar', oldDataIndex);
-
-  // Si el indice es distinto de -1, es decir, si existe el docente
-  if (oldDataIndex !== -1) {
-    updatedData.splice(oldDataIndex, 1);
-  }
-
   return updatedData;
 }

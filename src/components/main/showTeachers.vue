@@ -3,7 +3,7 @@
       <button
         class="update"
         @click="updateButton"
-        :class="{'disable' : updating}"
+        :class="{ 'disable': updating }"
       >
         <p>Actualizar</p>
         <p :class="{ 'rotate': updating }">
@@ -22,13 +22,17 @@
             <th>Correo electrónico</th>
             <th>Teléfono</th>
             <th>Dni</th>
-            <th>Opciones</th>
+            <th v-if="storedUser.tipo === 'admin'">Opciones</th>
           </tr>
         </thead>
         <tbody>
             <tr v-for="teacher in localData" :key="teacher.cif">
+              {{ teacher[0]  }}
             <td :class="{ 'empty': !teacher.nombre }">
-              <span>{{ teacher.nombre }}</span>
+              <span>
+                <font-awesome-icon :icon="['fas', 'user-graduate']" />
+                {{ teacher.nombre }}
+              </span>
             </td>
             <td :class="{ 'empty': !teacher.correo }">
               <span>{{ teacher.correo ? teacher.correo : '-' }}</span>
@@ -39,7 +43,7 @@
             <td :class="{ 'empty': !teacher.dni }">
               <span>{{ teacher.dni }}</span>
             </td>
-            <td class="icons" v-if="teacher.dni !== storedUser.dni">
+            <td class="icons" v-if="teacher.dni !== storedUser.dni && storedUser.tipo === 'admin'">
               <font-awesome-icon
                 :icon="['fas', 'pen-to-square']"
                 @click="editFormData(teacher.dni)"
@@ -71,7 +75,7 @@
                 name="dni"
                 id="dni"
                 placeholder="A12345678"
-                v-model.lazy="dataSelected.dni"
+                v-model="dataSelected.dni"
                 required
               >
             </fieldset>
@@ -83,7 +87,7 @@
                 id="nombre"
                 placeholder="Alejandro"
                 required
-                v-model.lazy="dataSelected.nombre"
+                v-model="dataSelected.nombre"
               >
             </fieldset>
             <fieldset v-if="modalOption !== 'edit'">
@@ -106,7 +110,7 @@
                 id="telefono"
                 placeholder="965331234"
                 required
-                v-model.lazy="dataSelected.telefono"
+                v-model="dataSelected.telefono"
               >
             </fieldset>
             <fieldset>
@@ -117,8 +121,19 @@
                 id="correo"
                 placeholder="example@example.com"
                 required
-                v-model.lazy="dataSelected.correo"
+                v-model="dataSelected.correo"
               >
+            </fieldset>
+          </section>
+          <section class="contrasena" v-if="modalOption == 'edit'">
+            <fieldset>
+              <label for="contrasena">Contraseña</label>
+              <input
+                  type="password"
+                  name="contrasena"
+                  id="contrasena"
+                  placeholder="*******"
+                >
             </fieldset>
           </section>
           <section class="buttons">
@@ -135,7 +150,6 @@
         <font-awesome-icon v-else :icon="['fas', 'plus']" />
       </button>
     </section>
-
     <button type="button" class="add" @click="buttonAdd">
       <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
       <font-awesome-icon v-else :icon="['fas', 'plus']" />
@@ -144,11 +158,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+
 import { getAllData, editData, deleteData } from '../../controllers/data';
-import { addLocalStorage } from '../../controllers/localStorage';
 import { newTeacher } from '../../controllers/api/teachers';
 import submitButton from '../submitButton.vue';
-import { getUserLocalStorage } from '../../controllers/session';
+
+import profesoresStore from '../../store/profesores';
+import userStore from '../../store/user';
+
+const store = profesoresStore();
+const userStored = userStore();
 
 const storedUser = ref({});
 
@@ -171,9 +190,9 @@ async function updateData(force = false) {
   if (force) {
     console.log('Forzando actualización de datos');
   }
-  const dataUpdated = await getAllData('teachers', force);
+  await getAllData('teachers', force);
 
-  localData.value = dataUpdated.data;
+  localData.value = store.getProfesores.listado;
   loading.value = false;
 }
 
@@ -184,17 +203,15 @@ function editFormData(id) {
     edit.value = id;
     modal.value = true;
     modalOption.value = 'edit';
-    dataSelected.value = localData.value.find((teacher) => teacher.dni === id);
+    dataSelected.value = { ...localData.value.find((teacher) => teacher.dni === id) };
   }
 }
 
 async function deleteFormData(id) {
   console.log('Eliminando: ', id);
   loading.value = true;
-  const dataUpdated = await deleteData('teachers', id);
-  console.log('data: ', dataUpdated.data);
-  if (!dataUpdated.data) localData.value = [];
-  localData.value = dataUpdated.data;
+  await deleteData('teachers', id);
+  await updateData();
   loading.value = false;
 }
 
@@ -208,6 +225,7 @@ const buttonAdd = () => {
   modal.value = !modal.value;
   if (modal.value) {
     modalOption.value = 'add';
+    dataSelected.value = {};
   }
 };
 
@@ -221,9 +239,7 @@ const onSubmit = async (event) => {
 
   if (modalOption.value === 'edit') {
     responseData = await editData('teachers', data);
-    console.log('responseData:', responseData);
     if (responseData) {
-      localData.value = responseData.data;
       event.target.classList.add('bounce');
       errorMessage.value = 'Error al Actualizar al docente';
       modal.value = false;
@@ -232,11 +248,9 @@ const onSubmit = async (event) => {
   } else {
     responseData = await newTeacher(data);
     if (responseData) {
-      localData.value.push(responseData);
-      console.log('responseData:', responseData);
-      await addLocalStorage(responseData, 'teachers');
       newData.value = false;
       submitLoading.value = false;
+      await updateData();
       modal.value = false;
     } else {
       errorMessage.value = 'Error al añadir al docente';
@@ -249,7 +263,8 @@ const onSubmit = async (event) => {
 };
 
 onMounted(async () => {
-  storedUser.value = await getUserLocalStorage();
+  storedUser.value = await userStored.getUser;
+
   await updateData();
   const formInputs = document.querySelectorAll('#modalForm input:not([type="submit"])');
   formInputs.forEach((input) => {
@@ -261,164 +276,187 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
 section.tableData {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 section.tableData table thead {
-    color: var(--color-text-muted);
-    text-align: left;
-    margin-bottom: 0.5rem;
-    /* Add margin-bottom to create space */
+  color: var(--color-text-muted);
+  text-align: left;
+  margin-bottom: 0.5rem;
+  /* Add margin-bottom to create space */
 }
 
 table thead th {
-    font-weight: inherit;
-    border-bottom: 1px solid var(--color-text-muted);
-    text-align: left;
+  font-weight: inherit;
+  border-bottom: 1px solid var(--color-text-muted);
+  text-align: left;
 }
 
 section.tableData table tbody td {
-    color: var(--color-text-muted);
-    border-bottom: 1px solid var(--color-text-muted);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-text-muted);
 }
 
 button.add {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
 
-    width: 50px;
-    height: 52px;
+  width: 50px;
+  height: 52px;
 
-    border-radius: 100%;
-    outline: none;
-    border: none;
+  border-radius: 100%;
+  outline: none;
+  border: none;
+
+  background-color: var(--color-background-soft);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 button.add.variant {
-    position: relative;
-    top: -180px;
-    border-radius: 100%;
-    outline: none;
-    border: none;
+  position: relative;
+  top: -262px;
+  border-radius: 100%;
+  outline: none;
+  border: none;
+
+  background-color: var(--color-background);
 }
-header{
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
+
+header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
 }
-button.update{
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    border: none;
-    outline: none;
-    background-color: transparent;
+
+button.update {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border: none;
+  outline: none;
+  background-color: transparent;
 
 }
+
 section.modal {
-    position: fixed;
-    display: none;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 
 }
 
 section.modal.is-active {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-form{
-        width: max-content;
-        padding: 15px;
-        background: var(--color-background-soft);
+form {
+  width: max-content;
+  padding: 15px;
+  background: var(--color-background-soft);
 
-        border: 1px solid black;
-        border-radius: 5px;
-    }
+  border: 1px solid black;
+  border-radius: 5px;
+}
 
-    section.container{
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    section.personal,
-    section.contact{
-        display: flex;
-        flex-direction: row;
-    }
-    section.personal fieldset,
-    section.contact fieldset{
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    section.buttons{
-        display: flex;
-        justify-content: space-between;
-        align-self: center;
-    }
+section.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-    section.buttons input[type="button"]{
-        background-color: aliceblue;
-    }
-    section.loading,
-    section.noData{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-    }
+section.personal,
+section.contact{
+  display: flex;
+  flex-direction: row;
+}
+section.contrasena{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+section.personal fieldset,
+section.contact fieldset,
+section.contrasena fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-    section.noData{
-        height: 100%;
-    }
-    td{
-        height: 30px;
-    }
-    td.icons{
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-    td.empty{
-        color: var(--color-text-muted);
-        text-align: center;
-    }
-    td span{
-        width: 100%;
-    }
-    td input{
-        width: 100%;
-        height: 100%;
-        border: none;
-        outline: none;
-        background-color: transparent;
-        padding: 0;
-        font-size: inherit;
-        color: inherit;
-        border-bottom: 1px solid var(--color-text-muted);
-    }
-    section.editZone{
-        display: flex;
-        gap: 1rem;
-    }
-    .bounce{
-          animation: bounce 0.5s 1 linear forwards;
-        }
+section.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-self: center;
+}
+
+section.buttons input[type="button"] {
+  background-color: aliceblue;
+}
+
+section.loading,
+section.noData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+section.noData {
+  height: 100%;
+}
+
+td {
+  height: 30px;
+}
+
+td.icons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+td.empty {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+td span {
+  width: 100%;
+}
+
+td input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-bottom: 1px solid var(--color-text-muted);
+}
+
+section.editZone {
+  display: flex;
+  gap: 1rem;
+}
+
+.bounce {
+  animation: bounce 0.5s 1 linear forwards;
+}
 
 </style>

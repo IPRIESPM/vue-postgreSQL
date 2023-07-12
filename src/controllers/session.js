@@ -21,11 +21,3 @@ export default async function login(data) {
     throw new Error(`Error en la solicitud de inicio de sesión: ${error.message}`);
   }
 }
-
-export async function userLocalStorage(user) {
-  localStorage.setItem('userData', JSON.stringify(user));
-}
-export async function getUserLocalStorage() {
-  const userJson = await localStorage.getItem('userData');
-  return JSON.parse(userJson);
-}

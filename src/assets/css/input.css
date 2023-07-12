@@ -62,3 +62,20 @@ button[type="button"].loading {
     justify-content: center;
     gap: 10px;
 }
+
+select {
+    width: 100%;
+    padding: 15px;
+    color: var(--button-text);
+    border: 2px solid transparent;
+    outline: none;
+    background: var(--color-background);
+}
+
+
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
