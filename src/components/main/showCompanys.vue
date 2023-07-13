@@ -161,7 +161,7 @@
                   :selected="teacher.dni === dataSelected.dni_profesor">
                     {{ teacher.nombre }}
                   </option>
-                  
+
               </select>
             </fieldset>
           </section>
@@ -236,6 +236,15 @@ async function updateData(force = false) {
   loading.value = false;
 }
 
+const showHideModal = () => {
+  modal.value = !modal.value;
+  if (modal.value) {
+    console.log('actualizando profesores: ');
+    getAllData('teachers', 'force');
+    teachersData.value = teacherStored.getProfesores.listado;
+  }
+};
+
 function editFormData(id) {
   if (edit.value === id) {
     edit.value = null;
@@ -246,14 +255,7 @@ function editFormData(id) {
     dataSelected.value = { ...localData.value.find((company) => company.cif === id) };
   }
 }
-const showHideModal = () => {
-  modal.value = !modal.value;
-  if (modal.value) {
-    console.log('actualizando profesores: ');
-    getAllData('teachers', 'force');
-    teachersData.value = teacherStored.getProfesores.listado;
-  }
-}
+
 async function deleteFormData(id) {
   console.log('Eliminando: ', id);
   loading.value = true;
@@ -263,7 +265,6 @@ async function deleteFormData(id) {
 }
 
 const updateButton = async () => {
-
   updating.value = true;
   await updateData(true);
   updating.value = false;
@@ -276,8 +277,6 @@ const buttonAdd = () => {
     dataSelected.value = {};
   }
 };
-
-
 
 const onSubmit = async (event) => {
   event.preventDefault();
@@ -300,15 +299,14 @@ const onSubmit = async (event) => {
 
     submitLoading.value = false;
   } else {
-
-    console.log("Estoy creando una nueva empresa");
+    console.log('Estoy creando una nueva empresa');
     responseData = await newCompany(data);
     if (responseData) {
-      console.log("La empresa se ha creado correctamente");
+      console.log('La empresa se ha creado correctamente');
       submitLoading.value = false;
-      console.log("Actualizando datos");
+      console.log('Actualizando datos');
       updateData(true);
-      console.log("Datos actualizados");
+      console.log('Datos actualizados');
       modal.value = false;
     } else {
       errorMessage.value = 'Error al añadir';
@@ -411,7 +409,6 @@ button.update {
   background-color: transparent;
 
 }
-
 section.modal {
   position: fixed;
   display: none;

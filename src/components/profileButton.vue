@@ -36,7 +36,8 @@ const navigateTo = (route) => {
     <button class="profile-button" type="button" @click="showOptions" v-if="user">
       <font-awesome-icon :icon="['fas', 'circle-user']" />
       <span>{{ user.nombre }}</span>
-      <font-awesome-icon :icon="['fas', 'angle-down']" />
+      <font-awesome-icon :icon="['fas', 'angle-up']" v-if="navVisible" />
+      <font-awesome-icon :icon="['fas', 'angle-down']" v-else />
       <nav :class="{ 'show-nav': navVisible }">
         <a @click="navigateTo('perfil')">Perfil</a>
         <a @click="destroyCookie">Cerrar Sesión</a>
@@ -72,14 +73,14 @@ nav {
 
   opacity: 0;
   visibility: hidden;
-  transition: all 0.8s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 nav.show-nav {
   opacity: 1;
   top: 70px;
   visibility: visible;
-  transition: all 0.8s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 nav a {

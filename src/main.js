@@ -19,6 +19,7 @@ library.add(
   solidIcons.faUserGraduate,
   solidIcons.faAddressCard,
   solidIcons.faCircleUser,
+  solidIcons.faAngleUp,
   solidIcons.faAngleDown,
   solidIcons.faPlus,
   solidIcons.faMinus,

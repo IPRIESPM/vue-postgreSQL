@@ -1,0 +1,8 @@
+form {
+    width: max-content;
+    padding: 15px;
+    background: var(--color-background-soft);
+
+    border: 1px solid black;
+    border-radius: 5px;
+}
