@@ -194,16 +194,6 @@
         <font-awesome-icon :icon="['fas', 'building']" />
         {{ profile.direccion }} {{ profile.localidad }}, {{ profile.comunidad }}
       </p>
-
-      <p class="encargado">
-        <span>
-          <font-awesome-icon :icon="['fas', 'mobile']" /> {{ profile.telefono }}
-        </span>
-        <span>
-          <font-awesome-icon :icon="['fas', 'user-graduate']" />
-          {{ profile.nombre_profesor }}
-        </span>
-      </p>
     </section>
     <section class="contacts">
       <h2>Contactos <StandardButton idleText="añadir" @click="buttonAdd('contactos')" /></h2>
@@ -356,12 +346,8 @@ const onSubmitContact = async (event) => {
 
   let response;
 
-  if (editMode.value) {
-    response = await updateContactFromApi(newContactData.value);
-    editMode.value = false;
-  } else {
-    response = await newContact(newContactData.value);
-  }
+  response = await newContact(newContactData.value);
+
   if (response) {
     await getCompanyProfile();
     buttonAdd('close');
