@@ -1,7 +1,7 @@
 <template>
   <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }">
     <section class="modal-main">
-      <form v-if="modalType === 'contactos'" @submit="onSubmit">
+      <form v-if="modalType === 'contactos'" @submit="onSubmitContact">
         <section class="header">
           <h2>Añadir contacto</h2>
           <p>Introduce los datos del nuevo contacto</p>
@@ -16,7 +16,7 @@
                 id="dni"
                 placeholder="12345678A"
                 required
-                v-model="newContact.dni"
+                v-model="newContactData.dni"
               />
             </fieldset>
             <fieldset>
@@ -27,7 +27,7 @@
                 id="nombre"
                 placeholder="Silvia Amorós"
                 required
-                v-model="newContact.nombre"
+                v-model="newContactData.nombre"
               />
             </fieldset>
           </section>
@@ -41,7 +41,7 @@
                 id="correo"
                 placeholder="example@example"
                 required
-                v-model="newContact.correo"
+                v-model="newContactData.correo"
               />
             </fieldset>
 
@@ -53,7 +53,7 @@
                 id="telefono"
                 placeholder="612345678"
                 required
-                v-model="newContact.telefono"
+                v-model="newContactData.telefono"
               />
             </fieldset>
           </section>
@@ -61,7 +61,7 @@
         <section class="fieldset-group">
           <fieldset>
             <label for="tipo">Tipo</label>
-            <select name="tipo" id="tipo" v-model="newContact.tipo" >
+            <select name="tipo" id="tipo" v-model="newContactData.tipo" >
               <option value="Gerente">Gerente</option>
               <option value="Jefe Proyecto">Jefe Proyecto</option>
               <option value="Técnico">Técnico</option>
@@ -71,7 +71,12 @@
           </fieldset>
           <fieldset class="checkbox">
             <label for="principal" >Principal</label>
-            <input type="checkbox" name="principal" id="principal" v-model="newContact.principal" />
+            <input
+                type="checkbox"
+                name="principal"
+                id="principal"
+                v-model="newContactData.principal"
+            />
           </fieldset>
         </section>
 
@@ -82,7 +87,7 @@
             id="funciones"
             cols="30"
             rows="10"
-            v-model="newContact.funciones"
+            v-model="newContactData.funciones"
           ></textarea>
         </fieldset>
 
@@ -198,14 +203,42 @@
       </p>
     </section>
     <section class="contacts">
-      <h2>Contactos</h2>
-      <ul v-if="contacts">
-        <li v-for="contact in contacts" :key="contact.n">
-          <p>{{ contact.nombre }}</p>
-          <p>{{ contact.email }}</p>
-          <p>{{ contact.telefono }}</p>
-        </li>
-      </ul>
+      <h2>Contactos <StandardButton idleText="añadir" @click="buttonAdd('contactos')" /></h2>
+      <section class="contact-data" v-if="contacts && contacts.length > 0">
+        <table >
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th class="empty">Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr v-for="contact in contacts" :key="contact.n">
+              <td>{{ contact.nombre }}</td>
+              <td>{{ contact.telefono }}</td>
+              <td>{{ contact.correo }}</td>
+              <td class="icons">
+                    <font-awesome-icon
+                        :icon="['fas', 'pen-to-square']"
+                        @click="editFormData(company.cif)"
+                    />
+                    <font-awesome-icon
+                        :icon="['fas', 'trash']"
+                        @click="deleteFormData(company.cif)"
+                    />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <section class="anotaciones">
+            <h3>Anotaciones</h3>
+            <section v-if="profile.anotaciones" class="anotaciones-data"></section>
+            <section v-else class="noData">No hay anotaciones 😢</section>
+            <p>{{ profile.anotaciones }}</p>
+        </section>
+        </section>
       <section class="noData" v-else>
         <p>No hay contactos 😢</p>
         <StandardButton idleText="añadir" @click="buttonAdd('contactos')" />
@@ -213,7 +246,7 @@
     </section>
     <section class="puestos">
       <h2>Puestos</h2>
-      <ul v-if="puestos">
+      <ul v-if="puestos && puestos.length > 0">
         <li v-for="puesto in puestos" :key="puesto.cod">
           <p>{{ puesto.nombre }}</p>
           <p>{{ puesto.descripcion }}</p>
@@ -233,6 +266,7 @@ import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
 import StandardButton from '../standardButton.vue';
+import { newContact } from '../../controllers/api/contactats';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -247,7 +281,7 @@ const showModal = ref(false);
 const modalType = ref('');
 const loading = ref(false);
 
-const newContact = ref({
+const newContactData = ref({
   dni: '',
   nombre: '',
   correo: '',
@@ -255,6 +289,7 @@ const newContact = ref({
   tipo: 'RRHH',
   principal: false,
   funciones: '',
+  empresa: profile.value.cif,
 });
 
 const newPuesto = ref({
@@ -266,7 +301,7 @@ const newPuesto = ref({
 });
 
 const resetFromData = () => {
-  newContact.value = {
+  newContactData.value = {
     dni: '',
     nombre: '',
     correo: '',
@@ -274,6 +309,7 @@ const resetFromData = () => {
     tipo: 'RRHH',
     principal: false,
     funciones: '',
+    empresa: profile.value.cif,
   };
   newPuesto.value = {
     anyo: '',
@@ -303,20 +339,22 @@ const getCompanyProfile = async () => {
   profile.value = profileApi.empresa;
   contacts.value = profileApi.contactos;
   puestos.value = profileApi.puestos;
+
+  newContactData.value.empresa = profile.value.cif;
 };
-const onSubmit = async (event) => {
+
+const onSubmitContact = async (event) => {
   event.preventDefault();
   loading.value = true;
 
-  const response = await companyProfile.addContact(
-    companyStored.getEmpresaSelected,
-    newContact.value,
-  );
+  const response = await newContact(newContactData.value);
+  getCompanyProfile();
   if (response) {
-    getCompanyProfile();
     buttonAdd('close');
+    loading.value = false;
   }
 };
+
 onBeforeMount(() => {
   if (companyStored.getEmpresaSelected === '') {
     router.push({ name: 'empresas' });
@@ -328,6 +366,7 @@ onMounted(async () => {
     loading.value = true;
     selectedCompany.value = companyStored.getEmpresaSelected;
     await getCompanyProfile();
+
     loading.value = false;
   }
 });
@@ -404,5 +443,25 @@ button.cancel {
     border-radius: 2px;
     height: 48px;
 }
+section.contact-data{
+    width: 100%;
+    display: flex;
+}
 
+section.anotaciones{
+
+    padding: 0.5rem;
+}
+section.contact-data h3{
+    font-size: 0.9rem;
+}
+table{
+    border: none;
+    border-collapse: collapse;
+}
+td,
+th{
+    padding-left: 0.5rem;
+    column-gap: 15px;
+}
 </style>

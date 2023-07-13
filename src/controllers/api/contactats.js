@@ -1,17 +1,14 @@
 import Cookies from 'js-cookie';
 
-const serverPath = 'http://vps-3258627-x.dattaweb.com:8084/api/empresa/';
-export default async function getAllCompanysFromApi(version) {
-  const url = serverPath;
-
+const serverPath = 'http://vps-3258627-x.dattaweb.com:8084/api/contacto/';
+export default async function getContactsById(cif) {
+  const url = `${serverPath}empresa/${cif}`;
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: Cookies.get('token'),
-        version,
-        table: 'empresa',
       },
     });
 
@@ -30,18 +27,16 @@ export default async function getAllCompanysFromApi(version) {
   }
 }
 
-export async function newCompany(data) {
-  const {
-    cif, nombre, localidad, comunidad, direccion, telefono, profesor,
-  } = data;
-
+export async function newContact(data) {
   const url = serverPath;
-
+  const {
+    dni, nombre, correo, telefono, tipo, principal, funciones, empresa,
+  } = data;
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono, profesor,
+        dni, nombre, correo, telefono, tipo, principal, funciones, empresa,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +63,6 @@ export async function updateCompanyFromApi(data) {
     comunidad,
     direccion,
     telefono,
-    profesor,
   } = data;
 
   const url = serverPath + cif;
@@ -77,7 +71,7 @@ export async function updateCompanyFromApi(data) {
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono, profesor,
+        cif, nombre, localidad, comunidad, direccion, telefono,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -98,6 +92,7 @@ export async function updateCompanyFromApi(data) {
 
 export async function deleteCompanyFromApi(cif) {
   const url = serverPath + cif;
+
   try {
     const response = await fetch(url, {
       method: 'DELETE',
