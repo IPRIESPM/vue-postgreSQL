@@ -8,7 +8,7 @@ import NewProfesor from '../components/newProfesor.vue';
 const router = useRouter();
 
 if (Cookie.get('token')) {
-    router.push({ name: 'dashboard' });
+  router.push({ name: 'dashboard' });
 }
 
 </script>

@@ -1,4 +1,5 @@
 <template>
+    test ci/cd
     <section class="loading" v-if="loading">
         Cargando empresa
         <div class="loading"></div>
