@@ -15,11 +15,11 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          host: ${{ secrets.SERVER_IP }}
+          host: ${{ secrets.SSH_SERVER_IP }}
           username: ${{ secrets.USERNAME }}
           port: 5780
 
       - name: Deploy to VPS
         run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
+          ssh ${{ secrets.USERNAME }}@${{ secrets.SSH_SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
 
