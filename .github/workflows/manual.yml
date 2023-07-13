@@ -21,7 +21,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.SSH_SERVER_IP }}
           REMOTE_USER: "isaac"
           REMOTE_PORT: 5780
-          TARGET: "/home/isaac"
+          TARGET: "/home/isaac/"
           SCRIPT: |
             cd proyects/vue-postgreSQL/
             git pull origin main
