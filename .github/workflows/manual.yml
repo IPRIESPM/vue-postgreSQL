@@ -14,7 +14,7 @@ jobs:
       - name: Set up SSH connection
         uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           host: ${{ secrets.SSH_SERVER_IP }}
           username: ${{ secrets.USERNAME }}
           port: 5780
@@ -22,4 +22,6 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.USERNAME }}@${{ secrets.SSH_SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
+
+
 
