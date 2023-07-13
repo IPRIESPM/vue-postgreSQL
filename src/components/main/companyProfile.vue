@@ -346,13 +346,18 @@ const onSubmitContact = async (event) => {
 
   let response;
 
-  response = await newContact(newContactData.value);
-
+  if (editMode.value) {
+    response = await updateContactFromApi(newContactData.value);
+    editMode.value = false;
+  } else {
+    response = await newContact(newContactData.value);
+  }
   if (response) {
     await getCompanyProfile();
     buttonAdd('close');
     loading.value = false;
     resetFromData();
+    editMode.value = false;
   } else {
     loading.value = false;
     errorMesages.value = 'Error al añadir el contacto';
