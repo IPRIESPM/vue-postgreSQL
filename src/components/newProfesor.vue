@@ -1,23 +1,24 @@
 <script setup>
-import logoSvg from '../assets/svg/Logo.svg';
-import login from '../controllers/profesor';
+import {
+    newTeacher,
+} from '../controllers/api/teachers';
+
 
 const onSubmit = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  const formData = new FormData(event.target);
-  const data = Object.fromEntries(formData);
-  const loginData = await login(data);
-  if (loginData) {
-    console.log(`Login correcto ${data}`);
-  }
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    const loginData = await newTeacher(data);
+    if (loginData) {
+        console.log(`Login correcto ${data}`);
+    }
 };
 </script>
 
 <template>
     <section>
         <figure>
-            <img :src="logoSvg" alt="Logo">
             <h1>CRM</h1>
         </figure>
         <form @submit="onSubmit">
@@ -35,7 +36,11 @@ const onSubmit = async (event) => {
                 <input type="text" name="nombre" id="nombre" placeholder="Silvia Amorós">
             </fieldset>
             <fieldset>
-                <label for="telefono">Telefono</label>
+                <label for="correo">Correo electrónico</label>
+                <input type="email" name="correo" id="correo" placeholder="example@example">
+            </fieldset>
+            <fieldset>
+                <label for="telefono">Teléfono</label>
                 <input type="tel" name="telefono" id="telefono" placeholder="635535989">
             </fieldset>
         </fieldset>
@@ -46,7 +51,6 @@ const onSubmit = async (event) => {
 
 <style scoped>
 section {
-
     display: flex;
     flex-direction: column;
     align-items: center;

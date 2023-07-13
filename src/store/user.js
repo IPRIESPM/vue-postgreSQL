@@ -18,7 +18,7 @@ export default defineStore('user', {
       this.nombre = user.nombre;
       this.telefono = user.telefono;
       this.correo = user.correo;
-      this.tipo = user.admin || 'user';
+      this.tipo = user.tipo;
     },
   },
   persist: {

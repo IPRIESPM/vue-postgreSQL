@@ -26,11 +26,13 @@ export default defineStore('empresas', {
       this.listado.push(empresa);
     },
     updateEmpresa(empresa) {
+      console.log('updateEmpresa', empresa);
       const index = this.listado.findIndex((e) => e.cif === empresa.cif);
-      this.listado[index] = empresa;
+      console.log("estoy guardando", this.listado[index]);
+      //this.listado[index] = empresa;
     },
-    deleteEmpresa(empresa) {
-      const index = this.listado.findIndex((e) => e.cif === empresa.cif);
+    deleteEmpresa(cif) {
+      const index = this.listado.findIndex((e) => e.cif === cif);
       this.listado.splice(index, 1);
     },
   },

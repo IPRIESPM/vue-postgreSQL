@@ -48,7 +48,7 @@ export async function editData(section, newData) {
 
   if (section === 'companys') apiResponse = await updateCompanyFromApi(newData);
   if (section === 'teachers') apiResponse = await updateTeacherFromApi(newData);
-
+  console.log('apiResponse', apiResponse);
   if (!apiResponse) {
     console.log('error al guardar los datos');
     return false;

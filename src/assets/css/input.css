@@ -31,6 +31,8 @@ button[type="button"] {
 input[type="submit"]:hover,
 input[type="button"]:hover {
     background: var(--button-background-hover);
+    border: 2px solid var(--button-text-muted);
+    border-radius: 4px;
     transition: background 0.3s ease;
 }
 

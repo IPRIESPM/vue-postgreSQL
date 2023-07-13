@@ -29,8 +29,12 @@ export default defineStore('profesores', {
       const index = this.listado.findIndex((p) => p.dni === profesor.dni);
       this.listado[index] = profesor;
     },
-    deleteProfesor(profesor) {
-      const index = this.listado.findIndex((p) => p.dni === profesor.dni);
+    deleteProfesor(dni) {
+
+      const index = this.listado.findIndex((p) => p.dni === dni);
+      console.log("Profesor", dni);
+      console.log("index", index);
+      console.log("listado", this.listado);
       this.listado.splice(index, 1);
     },
   },

@@ -14,26 +14,22 @@
     <section class="loading" v-if="loading">
       Cargando <div class="loading"></div>
     </section>
-    <section class="tableData" v-else-if="localData && localData.length > 0">
+    <section class="tableData" v-else-if="localData.length > 0">
       <table>
         <thead>
           <tr>
-            <th>Cif</th>
             <th>Empresa</th>
             <th>Profesor Encargado</th>
             <th>Localidad</th>
+            <th class="empty">Vacantes</th>
+            <th class="empty">Ciclos</th>
             <th class="empty">Opciones</th>
           </tr>
         </thead>
         <tbody>
-
             <tr v-for="company in localData" :key="company.cif">
-              {{ company[0] }}
-
-              <td :class="{ 'empty': !company.cif }">
-              <span>{{ company.cif }}</span>
-            </td>
-              <td :class="{ 'empty': !company.nombre }" @click="goProfile(company.cif)">
+              {{ company[0]  }}
+            <td :class="{ 'empty': !company.nombre }" @click="goProfile(company.cif)">
 
               <span>
                 <font-awesome-icon :icon="['fas', 'address-card']" />
@@ -46,7 +42,12 @@
             <td :class="{ 'empty': !company.localidad }">
               <span>{{ company.localidad }}</span>
             </td>
-
+            <td :class="{ 'empty': !company.vacantes }">
+              <span>{{ company.vacantes ? company.vacantes : '-' }}</span>
+            </td>
+            <td :class="{ 'empty': !company.ciclos }">
+              <span>{{ company.ciclos ? company.ciclos : '-' }}</span>
+            </td>
             <td class="icons">
               <font-awesome-icon
                 :icon="['fas', 'pen-to-square']"
@@ -141,27 +142,29 @@
                 v-model="dataSelected.comunidad"
               >
             </fieldset>
+
+          </section>
+          <section class="contrasena" v-if="modalOption == 'edit'">
+            <fieldset>
+              <label for="contrasena">Contraseña</label>
+              <input
+                  type="password"
+                  name="contrasena"
+                  id="contrasena"
+                  placeholder="*******"
+                >
+            </fieldset>
           </section>
           <section>
-
             <fieldset>
               <label for="profesor">Profesor a cargo</label>
               <select name="profesor" id="profesor">
                 <option :value="teacher.dni"
-                  v-if="modalOption !== 'edit'"
                   v-for="teacher in teachersData"
                   :key="teacher.dni"
                   :selected="teacher.dni === storedUser.dni">
                     {{ teacher.nombre }}
                   </option>
-                  <option :value="teacher.dni"
-                  v-else
-                  v-for="teacher in teachersData"
-                  :key="teacher.dni + 1 * 23"
-                  :selected="teacher.dni === dataSelected.dni_profesor">
-                    {{ teacher.nombre }}
-                  </option>
-                  
               </select>
             </fieldset>
           </section>
@@ -209,6 +212,7 @@ const loading = ref(true);
 const updating = ref(false);
 const localData = ref([]);
 const teachersData = ref([]);
+const newData = ref(false);
 const dataSelected = ref({});
 
 const submitError = ref(false);
@@ -221,18 +225,13 @@ const modalOption = ref('');
 const edit = ref(null);
 
 async function updateData(force = false) {
-  console.log('he conseguido entrar en updateData');
   if (force) {
     console.log('Forzando actualización de datos');
   }
   await getAllData('companys', force);
   console.log('Actualizando datos');
-  const listadoLocal = companyStored.getEmpresas;
-  console.log('los datos son:');
-  console.log('los datos son:', listadoLocal);
-
+  console.log('los datos son:', companyStored.getEmpresas.listado);
   localData.value = companyStored.getEmpresas.listado;
-
   loading.value = false;
 }
 
@@ -241,19 +240,12 @@ function editFormData(id) {
     edit.value = null;
   } else {
     edit.value = id;
-    showHideModal();
+    modal.value = true;
     modalOption.value = 'edit';
     dataSelected.value = { ...localData.value.find((company) => company.cif === id) };
   }
 }
-const showHideModal = () => {
-  modal.value = !modal.value;
-  if (modal.value) {
-    console.log('actualizando profesores: ');
-    getAllData('teachers', 'force');
-    teachersData.value = teacherStored.getProfesores.listado;
-  }
-}
+
 async function deleteFormData(id) {
   console.log('Eliminando: ', id);
   loading.value = true;
@@ -263,21 +255,20 @@ async function deleteFormData(id) {
 }
 
 const updateButton = async () => {
-
   updating.value = true;
   await updateData(true);
   updating.value = false;
 };
 
 const buttonAdd = () => {
-  showHideModal();
+  modal.value = !modal.value;
   if (modal.value) {
     modalOption.value = 'add';
     dataSelected.value = {};
+    getAllData('teachers', 'force');
+    teachersData.value = teacherStored.getProfesores.listado;
   }
 };
-
-
 
 const onSubmit = async (event) => {
   event.preventDefault();
@@ -294,21 +285,13 @@ const onSubmit = async (event) => {
       errorMessage.value = 'Error al Actualizar';
       modal.value = false;
     }
-    updateData(true);
-    getAllData('teachers', 'force');
-    teachersData.value = teacherStored.getProfesores.listado;
-
     submitLoading.value = false;
   } else {
-
-    console.log("Estoy creando una nueva empresa");
     responseData = await newCompany(data);
     if (responseData) {
-      console.log("La empresa se ha creado correctamente");
+      newData.value = false;
       submitLoading.value = false;
-      console.log("Actualizando datos");
-      updateData(true);
-      console.log("Datos actualizados");
+      await updateData();
       modal.value = false;
     } else {
       errorMessage.value = 'Error al añadir';
@@ -445,17 +428,15 @@ section.container {
 }
 
 section.personal,
-section.contact {
+section.contact{
   display: flex;
   flex-direction: row;
 }
-
-section.contrasena {
+section.contrasena{
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 section.personal fieldset,
 section.contact fieldset,
 section.contrasena fieldset {
@@ -526,4 +507,5 @@ section.editZone {
 .bounce {
   animation: bounce 0.5s 1 linear forwards;
 }
+
 </style>

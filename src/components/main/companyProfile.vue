@@ -3,19 +3,24 @@
         Cargando empresa
         <div class="loading"></div>
     </section>
-    <section v-else>
+    <section class="main" v-else>
+
         <h1> {{ profile.nombre }}</h1>
-        <p><font-awesome-icon :icon="['fas', 'building']" />
-            {{ profile.direccion }}  {{ profile.localidad }}, {{ profile.comunidad }}</p>
-        <p class="encargado">
+        <section class="empresa">
+            <p>
+                <font-awesome-icon :icon="['fas', 'building']" />
+                {{ profile.direccion }}  {{ profile.localidad }}, {{ profile.comunidad }}
+            </p>
+
+            <p class="encargado">
             <span>
                 <font-awesome-icon :icon="['fas', 'mobile']" /> {{ profile.telefono }}
             </span>
             <span>
                 <font-awesome-icon :icon="['fas', 'user-graduate']" /> {{ profile.nombre_profesor }}
             </span>
-        </p>
-
+            </p>
+        </section>
         <section class="contacts">
             <h2>Contactos</h2>
             <ul v-if="contacts">
@@ -25,7 +30,10 @@
                     <p>{{ contact.telefono }}</p>
                 </li>
             </ul>
-            <section v-else>No hay contactos</section>
+            <section class="noData"  v-else>
+                <p>No hay contactos 😢</p>
+                <StandardButton idleText="añadir" @click="buttonAdd"/>
+            </section>
         </section>
         <section class="puestos">
             <h2>Puestos</h2>
@@ -36,7 +44,10 @@
                     <p>{{ puesto.requisitos }}</p>
                 </li>
             </ul>
-            <section v-else>No hay puestos</section>
+            <section class="noData" v-else>
+                <p>No hay puestos 😢</p>
+                <StandardButton idleText="añadir" @click="buttonAdd"/>
+            </section>
         </section>
     </section>
 </template>
@@ -45,6 +56,7 @@ import { ref, onMounted, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
+import StandardButton from '../standardButton.vue';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -81,16 +93,28 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
-    section.loading{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        height: 100%
-    }
-    p.encargado{
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
+section.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    height: 100%
+}
+
+section.empresa {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+}
+
+section.noData{
+    text-align: center;
+}
+p.encargado {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 </style>

@@ -27,7 +27,7 @@
         </thead>
         <tbody>
             <tr v-for="teacher in localData" :key="teacher.dni">
-              {{ teacher[0]  }}
+              {{ teacher[0] }}
             <td :class="{ 'empty': !teacher.nombre }">
               <span>
                 <font-awesome-icon :icon="['fas', 'user-graduate']" />
@@ -77,6 +77,7 @@
                 placeholder="A12345678"
                 v-model="dataSelected.dni"
                 required
+                :readonly="modalOption === 'edit'"
               >
             </fieldset>
             <fieldset>
@@ -250,7 +251,7 @@ const onSubmit = async (event) => {
     if (responseData) {
       newData.value = false;
       submitLoading.value = false;
-      await updateData();
+      await updateData(true);
       modal.value = false;
     } else {
       errorMessage.value = 'Error al añadir al docente';
@@ -328,6 +329,10 @@ button.add.variant {
   background-color: var(--color-background);
 }
 
+button.add.variant.edit {
+  top: -262px;
+}
+
 header {
   width: 100%;
   display: flex;
@@ -380,15 +385,17 @@ section.container {
 }
 
 section.personal,
-section.contact{
+section.contact {
   display: flex;
   flex-direction: row;
 }
-section.contrasena{
+
+section.contrasena {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 section.personal fieldset,
 section.contact fieldset,
 section.contrasena fieldset {
@@ -458,5 +465,4 @@ section.editZone {
 .bounce {
   animation: bounce 0.5s 1 linear forwards;
 }
-
 </style>

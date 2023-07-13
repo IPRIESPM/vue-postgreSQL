@@ -3,11 +3,12 @@
 import Cookie from 'js-cookie';
 import { useRouter } from 'vue-router';
 import LoginForm from '../components/loginForm.vue';
+import NewProfesor from '../components/newProfesor.vue';
 
 const router = useRouter();
 
 if (Cookie.get('token')) {
-  router.push({ name: 'dashboard' });
+    router.push({ name: 'dashboard' });
 }
 
 </script>

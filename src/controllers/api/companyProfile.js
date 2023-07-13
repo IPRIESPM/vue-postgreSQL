@@ -1,8 +1,8 @@
 import Cookies from 'js-cookie';
 
+const serverPath = 'http://vps-3258627-x.dattaweb.com:8084/api/empresa/';
 export default async function getCompanyProfile(cif) {
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
-
+  const url = serverPath + cif;
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -32,7 +32,7 @@ export async function newCompany(data) {
     cif, nombre, localidad, comunidad, direccion, telefono, profesor,
   } = data;
 
-  const url = 'http://vps-3258627-x.dattaweb.com:8084/api/empresa';
+  const url = serverPath;
 
   try {
     const response = await fetch(url, {
@@ -67,7 +67,7 @@ export async function updateCompanyFromApi(data) {
     telefono,
   } = data;
 
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
+  const url = serverPath + cif;
 
   try {
     const response = await fetch(url, {
@@ -93,7 +93,7 @@ export async function updateCompanyFromApi(data) {
 }
 
 export async function deleteCompanyFromApi(cif) {
-  const url = `http://vps-3258627-x.dattaweb.com:8084/api/empresa/${cif}`;
+  const url = serverPath + cif;
 
   try {
     const response = await fetch(url, {
