@@ -1,27 +1,29 @@
 name: CI/CD
 
 on:
-  workflow_dispatch:
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
   deploy:
+    name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up SSH connection
-        uses: appleboy/ssh-action@master
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          host: ${{ secrets.SSH_SERVER_IP }}
-          username: ${{ secrets.USERNAME }}
-          port: 5780
+      - name: 🚚 Get Latest Code
+        uses: actions/checkout@v3
 
-      - name: Deploy to VPS
-        run: |
-          ssh -p 5780 ${{ secrets.USERNAME }}@${{ secrets.SSH_SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
+      - name: 📂 Sync Files to VPS
+        uses: easingthemes/ssh-deploy@v4.0.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_SERVER_IP }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          SCRIPT: |
+            cd proyects/vue-postgreSQL/
+            git pull origin main
+            npm install
 
 
 
