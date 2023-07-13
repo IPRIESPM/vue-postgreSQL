@@ -65,7 +65,7 @@ export async function updateContactFromApi(data) {
     tipo,
     principal,
     funciones,
-    modificado,
+    empresa,
   } = data;
 
   const url = serverPath;
@@ -82,7 +82,7 @@ export async function updateContactFromApi(data) {
         tipo,
         principal,
         funciones,
-        modificado,
+        empresa,
       }),
       headers: {
         'Content-Type': 'application/json',

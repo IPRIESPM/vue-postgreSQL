@@ -317,6 +317,7 @@ const resetFromData = () => {
     tipo: 'RRHH',
     principal: false,
     funciones: '',
+    empresa: profile.value.cif,
   };
   newPuesto.value = {
     anyo: anyoActual,
@@ -355,6 +356,9 @@ const onSubmitContact = async (event) => {
   let response;
 
   if (editMode.value) {
+    console.log('La empresa es:', profile.value.cif);
+    newContactData.value.empresa = profile.value.cif;
+    console.log('Los datos son:', newContactData.value);
     response = await updateContactFromApi(newContactData.value);
   } else {
     response = await newContact(newContactData.value);

@@ -65,6 +65,7 @@ export async function updateCompanyFromApi(data) {
     comunidad,
     direccion,
     telefono,
+    correo,
   } = data;
 
   const url = serverPath + cif;
@@ -73,7 +74,7 @@ export async function updateCompanyFromApi(data) {
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono,
+        cif, nombre, localidad, comunidad, direccion, telefono, correo,
       }),
       headers: {
         'Content-Type': 'application/json',
