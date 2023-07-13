@@ -12,6 +12,7 @@
                {{ userProfile.correo }}
             </p>
         </section>
+       <!---  <a @click="changeTheme">Cambiar el tema</a> -->
         <button type="button" @click="changeMode"> Editar </button>
     </section>
     <form id="userForm" @submit.prevent="onSubmit" v-else>
@@ -89,6 +90,7 @@ const submitLoading = ref(false);
 const submitError = ref(false);
 const errorMessage = ref('');
 const editMode = ref(false);
+const theme = ref('false');
 
 const changeMode = () => {
   editMode.value = !editMode.value;
@@ -113,7 +115,16 @@ const onSubmit = async (event) => {
   }
   submitLoading.value = false;
 };
+const changeTheme = () => {
+  if (theme.value === 'true') {
+    theme.value = 'false';
 
+    document.getElementsByTagName('body').setAttribute('data-theme', 'light');
+  } else {
+    document.setAttribute('data-theme', 'dark');
+    theme.value = 'true';
+  }
+};
 onMounted(async () => {
   userProfile.value = storedUser.getUser;
 });

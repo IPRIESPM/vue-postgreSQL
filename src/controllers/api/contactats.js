@@ -55,23 +55,34 @@ export async function newContact(data) {
   }
 }
 
-export async function updateCompanyFromApi(data) {
+export async function updateContactFromApi(data) {
   const {
-    cif,
+    n,
     nombre,
-    localidad,
-    comunidad,
-    direccion,
+    correo,
     telefono,
+    dni,
+    tipo,
+    principal,
+    funciones,
+    modificado,
   } = data;
 
-  const url = serverPath + cif;
+  const url = serverPath;
 
   try {
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
-        cif, nombre, localidad, comunidad, direccion, telefono,
+        n,
+        nombre,
+        correo,
+        telefono,
+        dni,
+        tipo,
+        principal,
+        funciones,
+        modificado,
       }),
       headers: {
         'Content-Type': 'application/json',

@@ -3,8 +3,8 @@
     <section class="modal-main">
       <form v-if="modalType === 'contactos'" @submit="onSubmitContact">
         <section class="header">
-          <h2>Añadir contacto</h2>
-          <p>Introduce los datos del nuevo contacto</p>
+          <h2 v-if="editMode">Editar contacto</h2>
+          <h2 v-else>Añadir nuevo contacto</h2>
         </section>
         <section class="main">
           <section class="fieldset-group">
@@ -15,7 +15,6 @@
                 name="dni"
                 id="dni"
                 placeholder="12345678A"
-                required
                 v-model="newContactData.dni"
               />
             </fieldset>
@@ -40,7 +39,6 @@
                 name="correo"
                 id="correo"
                 placeholder="example@example"
-                required
                 v-model="newContactData.correo"
               />
             </fieldset>
@@ -52,7 +50,6 @@
                 name="telefono"
                 id="telefono"
                 placeholder="612345678"
-                required
                 v-model="newContactData.telefono"
               />
             </fieldset>
@@ -92,7 +89,11 @@
         </fieldset>
 
         <section class="button-group">
-          <StandardButton :loading="loading" idleText="añadir" loadingText="Cargando" />
+          <StandardButton
+
+          :idleText="editMode ? 'Editar' : 'Añadir'"
+          :loading="loading"
+           loadingText="Cargando" />
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
           </button>
@@ -108,12 +109,14 @@
             <fieldset>
               <label for="anyo">Año {{ newPuesto.anyo }}</label>
               <input
-                type="date"
+                type="number"
                 name="anyo"
                 id="anyo"
                 required
+                min="2010"
+                :placeholder="anyoActual"
+
                 v-model="newPuesto.anyo"
-                @change="extractYear"
               />
             </fieldset>
             <fieldset>
@@ -222,11 +225,11 @@
               <td class="icons">
                     <font-awesome-icon
                         :icon="['fas', 'pen-to-square']"
-                        @click="editFormData(company.cif)"
+                        @click="editContact(contact.n)"
                     />
                     <font-awesome-icon
                         :icon="['fas', 'trash']"
-                        @click="deleteFormData(company.cif)"
+                        @click="deleteContact(contact.n)"
                     />
                 </td>
             </tr>
@@ -266,7 +269,7 @@ import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
 import StandardButton from '../standardButton.vue';
-import { newContact } from '../../controllers/api/contactats';
+import { newContact, updateContactFromApi } from '../../controllers/api/contactats';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -277,11 +280,18 @@ const profile = ref('');
 const contacts = ref('');
 const puestos = ref('');
 
+const errorMesages = ref('');
+
+const anyoActual = new Date().getFullYear();
+
 const showModal = ref(false);
 const modalType = ref('');
 const loading = ref(false);
 
+const editMode = ref(false);
+
 const newContactData = ref({
+  n: '',
   dni: '',
   nombre: '',
   correo: '',
@@ -293,7 +303,7 @@ const newContactData = ref({
 });
 
 const newPuesto = ref({
-  anyo: '',
+  anyo: anyoActual,
   vacantes: '',
   horario: '',
   ciclo: '',
@@ -302,6 +312,7 @@ const newPuesto = ref({
 
 const resetFromData = () => {
   newContactData.value = {
+    n: '',
     dni: '',
     nombre: '',
     correo: '',
@@ -312,7 +323,7 @@ const resetFromData = () => {
     empresa: profile.value.cif,
   };
   newPuesto.value = {
-    anyo: '',
+    anyo: anyoActual,
     vacantes: '',
     horario: '',
     ciclo: '',
@@ -329,17 +340,13 @@ const buttonAdd = (type) => {
   showModal.value = true;
   modalType.value = type;
 };
-const extractYear = (event) => {
-  const date = new Date(event.target.value);
-  newPuesto.value.anyo = date.getFullYear();
-};
+
 const getCompanyProfile = async () => {
   const profileApi = await companyProfile(companyStored.getEmpresaSelected);
   rawData.value = profileApi;
   profile.value = profileApi.empresa;
   contacts.value = profileApi.contactos;
   puestos.value = profileApi.puestos;
-
   newContactData.value.empresa = profile.value.cif;
 };
 
@@ -347,12 +354,31 @@ const onSubmitContact = async (event) => {
   event.preventDefault();
   loading.value = true;
 
-  const response = await newContact(newContactData.value);
-  getCompanyProfile();
+  let response;
+
+  if (editMode.value) {
+    response = await updateContactFromApi(newContactData.value);
+    editMode.value = false;
+  } else {
+    response = await newContact(newContactData.value);
+  }
   if (response) {
+    await getCompanyProfile();
     buttonAdd('close');
     loading.value = false;
+    resetFromData();
+  } else {
+    loading.value = false;
+    errorMesages.value = 'Error al añadir el contacto';
   }
+};
+
+const editContact = (contactN) => {
+  newContactData.value = contacts.value.find((contact) => contact.n === contactN);
+  newContactData.value.empresa = profile.value.cif;
+  buttonAdd('contactos');
+  editMode.value = true;
+  // updateContactFromApi();
 };
 
 onBeforeMount(() => {
