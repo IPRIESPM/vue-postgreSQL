@@ -188,7 +188,14 @@
     <div class="loading"></div>
   </section>
   <section class="main" v-else>
-    <h1>{{ profile.nombre }}</h1>
+    <header>
+      <h1>{{ profile.nombre }} {{ profile.cif }}</h1>
+      <span>
+        Responsable:
+        {{ profile.nombre_profesor }}
+      </span>
+    </header>
+
     <section class="empresa">
       <p>
         <font-awesome-icon :icon="['fas', 'building']" />
@@ -310,7 +317,6 @@ const resetFromData = () => {
     tipo: 'RRHH',
     principal: false,
     funciones: '',
-    empresa: profile.value.cif,
   };
   newPuesto.value = {
     anyo: anyoActual,
@@ -319,16 +325,6 @@ const resetFromData = () => {
     ciclo: '',
     descripcion: '',
   };
-};
-const buttonAdd = (type) => {
-  if (type === 'close') {
-    showModal.value = false;
-    modalType.value = '';
-    resetFromData();
-    return;
-  }
-  showModal.value = true;
-  modalType.value = type;
 };
 
 const getCompanyProfile = async () => {
@@ -340,6 +336,18 @@ const getCompanyProfile = async () => {
   newContactData.value.empresa = profile.value.cif;
 };
 
+const buttonAdd = async (type) => {
+  if (type === 'close') {
+    showModal.value = false;
+    modalType.value = '';
+    resetFromData();
+    return;
+  }
+  console.log('La empresa es:', profile.value.cif);
+  showModal.value = true;
+  modalType.value = type;
+};
+
 const onSubmitContact = async (event) => {
   event.preventDefault();
   loading.value = true;
@@ -348,12 +356,10 @@ const onSubmitContact = async (event) => {
 
   if (editMode.value) {
     response = await updateContactFromApi(newContactData.value);
-    editMode.value = false;
   } else {
     response = await newContact(newContactData.value);
   }
   if (response) {
-    await getCompanyProfile();
     buttonAdd('close');
     loading.value = false;
     resetFromData();
@@ -364,12 +370,11 @@ const onSubmitContact = async (event) => {
   }
 };
 
-const editContact = (contactN) => {
+const editContact = async (contactN) => {
   newContactData.value = contacts.value.find((contact) => contact.n === contactN);
-  newContactData.value.empresa = profile.value.cif;
+  await getCompanyProfile();
   buttonAdd('contactos');
   editMode.value = true;
-  // updateContactFromApi();
 };
 
 onBeforeMount(() => {
@@ -383,7 +388,6 @@ onMounted(async () => {
     loading.value = true;
     selectedCompany.value = companyStored.getEmpresaSelected;
     await getCompanyProfile();
-
     loading.value = false;
   }
 });
@@ -480,5 +484,15 @@ td,
 th{
     padding-left: 0.5rem;
     column-gap: 15px;
+}
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+}
+header span{
+    display: flex;
+    gap: 0.5em;
 }
 </style>
