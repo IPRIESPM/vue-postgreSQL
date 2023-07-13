@@ -178,12 +178,12 @@
         </section>
       </form>
       <button type="button" class="add variant" @click="buttonAdd">
-        <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
+        <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
         <font-awesome-icon v-else :icon="['fas', 'plus']" />
       </button>
     </section>
     <button type="button" class="add" @click="buttonAdd">
-      <font-awesome-icon v-if="modal" :icon="['fas', 'minus']" />
+      <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
       <font-awesome-icon v-else :icon="['fas', 'plus']" />
     </button>
   </template>

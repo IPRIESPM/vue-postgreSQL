@@ -179,7 +179,7 @@
     <button type="button"
         :class="{ 'puestos': modalType =='puestos' }"
         class="add" @click="buttonAdd('close')">
-      <font-awesome-icon v-if="showModal" :icon="['fas', 'minus']" />
+      <font-awesome-icon v-if="showModal" :icon="['fas', 'xmark']" />
       <font-awesome-icon v-else :icon="['fas', 'plus']" />
     </button>
   </section>
@@ -329,7 +329,9 @@ const resetFromData = () => {
 };
 
 const getCompanyProfile = async () => {
+  console.log('Actualizando datos');
   const profileApi = await companyProfile(companyStored.getEmpresaSelected);
+  console.log('El perfil es:', profileApi.contactos);
   rawData.value = profileApi;
   profile.value = profileApi.empresa;
   contacts.value = profileApi.contactos;
@@ -366,6 +368,7 @@ const onSubmitContact = async (event) => {
     loading.value = false;
     resetFromData();
     await getCompanyProfile();
+
     editMode.value = false;
   } else {
     loading.value = false;
@@ -374,11 +377,18 @@ const onSubmitContact = async (event) => {
 };
 
 const editContact = async (contactN) => {
-  newContactData.value = contacts.value.find((contact) => contact.n === contactN);
+  newContactData.value = { ...contacts.value.find((contact) => contact.n === contactN) };
   editMode.value = true;
   buttonAdd('contactos');
 };
-
+const deleteContact = async (contactN) => {
+  // const response = await deleteContactFromApi(contactN);
+  if (response) {
+    await getCompanyProfile();
+  } else {
+    errorMesages.value = 'Error al eliminar el contacto';
+  }
+};
 onBeforeMount(() => {
   if (companyStored.getEmpresaSelected === '') {
     router.push({ name: 'empresas' });
