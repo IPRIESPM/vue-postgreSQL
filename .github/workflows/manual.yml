@@ -21,7 +21,7 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -p 5780 -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.USERNAME }}@${{ secrets.SSH_SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
+          ssh -p 5780 ${{ secrets.USERNAME }}@${{ secrets.SSH_SERVER_IP }} "cd /path/to/app && git pull origin main && npm install && npm run build"
 
 
 
