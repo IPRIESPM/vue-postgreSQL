@@ -189,9 +189,9 @@
   </section>
   <section class="main" v-else>
     <header>
-      <h1>{{ profile.nombre }} {{ profile.cif }}</h1>
+      <h1>{{ profile.nombre }} - {{ profile.cif }}</h1>
       <span>
-        Responsable:
+        Profesor responsable:
         {{ profile.nombre_profesor }}
       </span>
     </header>
@@ -337,7 +337,7 @@ const getCompanyProfile = async () => {
   newContactData.value.empresa = profile.value.cif;
 };
 
-const buttonAdd = async (type) => {
+const buttonAdd = (type) => {
   if (type === 'close') {
     showModal.value = false;
     modalType.value = '';
@@ -356,9 +356,7 @@ const onSubmitContact = async (event) => {
   let response;
 
   if (editMode.value) {
-    console.log('La empresa es:', profile.value.cif);
     newContactData.value.empresa = profile.value.cif;
-    console.log('Los datos son:', newContactData.value);
     response = await updateContactFromApi(newContactData.value);
   } else {
     response = await newContact(newContactData.value);
@@ -367,6 +365,7 @@ const onSubmitContact = async (event) => {
     buttonAdd('close');
     loading.value = false;
     resetFromData();
+    await getCompanyProfile();
     editMode.value = false;
   } else {
     loading.value = false;
@@ -376,9 +375,8 @@ const onSubmitContact = async (event) => {
 
 const editContact = async (contactN) => {
   newContactData.value = contacts.value.find((contact) => contact.n === contactN);
-  await getCompanyProfile();
-  buttonAdd('contactos');
   editMode.value = true;
+  buttonAdd('contactos');
 };
 
 onBeforeMount(() => {

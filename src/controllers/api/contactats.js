@@ -71,6 +71,7 @@ export async function updateContactFromApi(data) {
   const url = serverPath;
 
   try {
+    console.log('Mandando datos', data);
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
