@@ -1,6 +1,6 @@
 <template>
-     <button v-if="loading" type="button" class="loading">
-        <span>{{loadingText}}</span>
+     <button v-if="loading" type="button" class="loading" :class="{ 'is-rounded': rounded }">
+        <span>{{loadingText}} es:{{ rounded }}</span>
         <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
       </button>
       <input v-else type="submit" :value="idleText">
@@ -13,11 +13,15 @@ defineProps({
   loading: Boolean,
   idleText: String,
   loadingText: String,
+  rounded: Boolean,
 });
 
 </script>
 <style scoped>
   input{
     text-transform: capitalize;
+  }
+  .is-rounded{
+    background-color: red;
   }
 </style>

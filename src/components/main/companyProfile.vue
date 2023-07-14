@@ -58,7 +58,7 @@
         <section class="fieldset-group">
           <fieldset>
             <label for="tipo">Tipo</label>
-            <select name="tipo" id="tipo" v-model="newContactData.tipo" >
+            <select name="tipo" id="tipo" v-model="newContactData.tipo">
               <option value="Gerente">Gerente</option>
               <option value="Jefe Proyecto">Jefe Proyecto</option>
               <option value="Técnico">Técnico</option>
@@ -67,12 +67,12 @@
             </select>
           </fieldset>
           <fieldset class="checkbox">
-            <label for="principal" >Principal</label>
+            <label for="principal">Principal</label>
             <input
-                type="checkbox"
-                name="principal"
-                id="principal"
-                v-model="newContactData.principal"
+              type="checkbox"
+              name="principal"
+              id="principal"
+              v-model="newContactData.principal"
             />
           </fieldset>
         </section>
@@ -90,10 +90,11 @@
 
         <section class="button-group">
           <StandardButton
-
-          :idleText="editMode ? 'Editar' : 'Añadir'"
-          :loading="loading"
-           loadingText="Cargando" />
+            rounded="true"
+            :idleText="editMode ? 'Editar' : 'Añadir'"
+            :loading="loading"
+            loadingText="Cargando"
+          />
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
           </button>
@@ -115,7 +116,6 @@
                 required
                 min="2010"
                 :placeholder="anyoActual"
-
                 v-model="newPuesto.anyo"
               />
             </fieldset>
@@ -140,31 +140,25 @@
                 name="horario"
                 id="horario"
                 placeholder="9:00 - 14:00"
-                required
               />
             </fieldset>
             <fieldset>
-                <label for="ciclo">Ciclo</label>
-                <select name="ciclo" id="ciclo">
-                    <option value="FPB">FPB</option>
-                    <option value="SMR">SMR</option>
-                    <option value="DAM">DAM</option>
-                    <option value="DAW">DAW</option>
-                    <option value="ASIR">ASIR</option>
-                    <option value="IMSA">IMSA</option>
-                </select>
+              <label for="ciclo">Ciclo</label>
+              <select name="ciclo" id="ciclo">
+                <option value="FPB">FPB</option>
+                <option value="SMR">SMR</option>
+                <option value="DAM">DAM</option>
+                <option value="DAW">DAW</option>
+                <option value="ASIR">ASIR</option>
+                <option value="IMSA">IMSA</option>
+              </select>
             </fieldset>
           </section>
         </section>
 
         <fieldset>
           <label for="descrip">Descripción</label>
-          <textarea
-            name="descrip"
-            id="descrip"
-            cols="30"
-            rows="10"
-          ></textarea>
+          <textarea name="descrip" id="descrip" cols="30" rows="10"></textarea>
         </fieldset>
 
         <section class="button-group">
@@ -175,10 +169,68 @@
         </section>
       </form>
 
+      <form v-if="modalType === 'anotaciones'">
+        <section class="header">
+          <h2>Añadir anotación</h2>
+        </section>
+        <section class="main">
+          <section class="fieldset-group">
+            <fieldset>
+              <label for="anyo">Año {{ newPuesto.anyo }}</label>
+              <input
+                type="number"
+                name="anyo"
+                id="anyo"
+                required
+                min="2010"
+                :placeholder="anyoActual"
+                v-model="newPuesto.anyo"
+              />
+            </fieldset>
+            <fieldset>
+              <label for="fecha">Fecha</label>
+              <input
+                type="date"
+                name="fecha"
+                id="fecha_actual"
+                :value="fechaActual"
+                required
+              />
+            </fieldset>
+          </section>
+
+          <section class="fieldset-group">
+            <fieldset>
+              <label for="ciclo">Tipo</label>
+              <select name="ciclo" id="ciclo">
+                <option value="FPB">Telefono</option>
+                <option value="SMR">Correo</option>
+                <option value="DAM">Persona</option>
+              </select>
+            </fieldset>
+
+          </section>
+        </section>
+
+        <fieldset>
+          <label for="descrip">Anotacion</label>
+          <textarea name="descrip" id="descrip" cols="30" rows="10"></textarea>
+        </fieldset>
+
+        <section class="button-group">
+          <StandardButton idleText="añadir" />
+          <button type="button" class="cancel" @click="buttonAdd('close')">
+            Cancelar
+          </button>
+        </section>
+      </form>
     </section>
-    <button type="button"
-        :class="{ 'puestos': modalType =='puestos' }"
-        class="add" @click="buttonAdd('close')">
+    <button
+      type="button"
+      :class="{ puestos: modalType == 'puestos' }"
+      class="add puestos"
+      @click="buttonAdd('close')"
+    >
       <font-awesome-icon v-if="showModal" :icon="['fas', 'xmark']" />
       <font-awesome-icon v-else :icon="['fas', 'plus']" />
     </button>
@@ -203,49 +255,69 @@
       </p>
     </section>
     <section class="contacts">
-      <h2>Contactos <StandardButton idleText="añadir" @click="buttonAdd('contactos')" /></h2>
+      <header>
+        <h2>Contactos</h2>
+        <button type="button" class="redondo" @click="buttonAdd('contactos')">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+        </button>
+      </header>
       <section class="contact-data" v-if="contacts && contacts.length > 0">
-        <table >
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th class="empty">Opciones</th>
-              </tr>
-            </thead>
-            <tbody>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Correo</th>
+              <th class="empty">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
             <tr v-for="contact in contacts" :key="contact.n">
               <td>{{ contact.nombre }}</td>
               <td>{{ contact.telefono }}</td>
               <td>{{ contact.correo }}</td>
               <td class="icons">
-                    <font-awesome-icon
-                        :icon="['fas', 'pen-to-square']"
-                        @click="editContact(contact.n)"
-                    />
-                    <font-awesome-icon
-                        :icon="['fas', 'trash']"
-                        @click="deleteContact(contact.n)"
-                    />
-                </td>
+                <font-awesome-icon
+                  :icon="['fas', 'pen-to-square']"
+                  @click="editContact(contact.n)"
+                />
+                <font-awesome-icon
+                  :icon="['fas', 'trash']"
+                  @click="deleteContact(contact.n)"
+                />
+              </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
         <section class="anotaciones">
-            <h3>Anotaciones</h3>
-            <section v-if="profile.anotaciones" class="anotaciones-data"></section>
-            <section v-else class="noData">No hay anotaciones 😢</section>
-            <p>{{ profile.anotaciones }}</p>
+          <header>
+          <h3>Anotaciones</h3>
+          <button type="button" class="redondo" @click="buttonAdd('anotaciones')">
+            <font-awesome-icon :icon="['fas', 'plus']" />
+          </button>
+        </header>
+          <section
+            v-if="profile.anotaciones"
+            class="anotaciones-data"
+          ></section>
+          <section v-else class="noData">No hay anotaciones 😢</section>
+          <p>{{ profile.anotaciones }}</p>
         </section>
-        </section>
+      </section>
       <section class="noData" v-else>
         <p>No hay contactos 😢</p>
-        <StandardButton idleText="añadir" @click="buttonAdd('contactos')" />
+        <button type="button" class="redondo" @click="buttonAdd('contactos')">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+        </button>
       </section>
     </section>
     <section class="puestos">
-      <h2>Puestos</h2>
+      <header>
+        <h2>Puestos</h2>
+        <button type="button" class="redondo" @click="buttonAdd('puestos')">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+        </button>
+      </header>
       <ul v-if="puestos && puestos.length > 0">
         <li v-for="puesto in puestos" :key="puesto.cod">
           <p>{{ puesto.nombre }}</p>
@@ -254,8 +326,9 @@
         </li>
       </ul>
       <section class="noData" v-else>
-        <p>No hay puestos 😢</p>
-        <StandardButton idleText="añadir" @click="buttonAdd('puestos')" />
+        <header>
+          <p>No hay puestos 😢</p>
+        </header>
       </section>
     </section>
   </section>
@@ -266,7 +339,11 @@ import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
 import StandardButton from '../standardButton.vue';
-import { newContact, updateContactFromApi } from '../../controllers/api/contactats';
+import {
+  newContact,
+  updateContactFromApi,
+  deleteContactFromApi,
+} from '../../controllers/api/contactats';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -280,6 +357,7 @@ const puestos = ref('');
 const errorMesages = ref('');
 
 const anyoActual = new Date().getFullYear();
+const fechaActual = ref(new Date().toISOString().split('T')[0]);
 
 const showModal = ref(false);
 const modalType = ref('');
@@ -377,12 +455,14 @@ const onSubmitContact = async (event) => {
 };
 
 const editContact = async (contactN) => {
-  newContactData.value = { ...contacts.value.find((contact) => contact.n === contactN) };
+  newContactData.value = {
+    ...contacts.value.find((contact) => contact.n === contactN),
+  };
   editMode.value = true;
   buttonAdd('contactos');
 };
 const deleteContact = async (contactN) => {
-  // const response = await deleteContactFromApi(contactN);
+  const response = await deleteContactFromApi(contactN);
   if (response) {
     await getCompanyProfile();
   } else {
@@ -402,109 +482,132 @@ onMounted(async () => {
     await getCompanyProfile();
     loading.value = false;
   }
+  const theme = document.documentElement.getAttribute('data-theme');
+  console.log('El tema es', theme);
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  console.log('El tema es', document.documentElement.getAttribute('data-theme'));
 });
 </script>
 <style scoped>
 section.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 100%;
 }
 
 section.empresa {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2em;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
 }
 
 section.noData {
-    text-align: center;
+  text-align: center;
 }
 
 p.encargado {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 button.add {
-    border-radius: 100%;
-    position: absolute;
-    transform: translateX(480%) translateY(-780%);
-}
-button.add.puestos {
-    transform: translateX(430%) translateY(-640%);
+  border-radius: 100%;
+  position: absolute;
+  transform: translateX(480%) translateY(-780%);
 }
 
+button.add.puestos {
+  transform: translateX(430%) translateY(-640%);
+}
+
+button.add.anotaciones {
+  transform: translateX(430%) translateY(-640%);
+}
 section.header {
-    margin-bottom: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 section.fieldset-group {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 section.button-group {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    justify-content: center;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
 }
 
 fieldset.checkbox {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding-top: 50px;
-    padding-left: 90px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 50px;
+  padding-left: 90px;
 }
 
 button.cancel {
-    background-color: var(--button-background-hover);
-    color: var(--color-text);
-    border: 1px solid var(--button-background);
+  background-color: var(--button-background-hover);
+  color: var(--color-text);
+  border: 1px solid var(--button-background);
 
-    border-radius: 2px;
-    height: 48px;
-}
-section.contact-data{
-    width: 100%;
-    display: flex;
+  border-radius: 2px;
+  height: 48px;
 }
 
-section.anotaciones{
+section.contact-data {
+  width: 100%;
+  display: flex;
+}
 
-    padding: 0.5rem;
+section.anotaciones {
+  padding: 0.5rem;
 }
-section.contact-data h3{
-    font-size: 0.9rem;
+
+section.contact-data h3 {
+  font-size: 0.9rem;
 }
-table{
-    border: none;
-    border-collapse: collapse;
+
+table {
+  border: none;
+  border-collapse: collapse;
 }
+
 td,
-th{
-    padding-left: 0.5rem;
-    column-gap: 15px;
+th {
+  padding-left: 0.5rem;
+  column-gap: 15px;
 }
-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
+
+header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5rem;
+  gap: 1rem;
 }
-header span{
-    display: flex;
-    gap: 0.5em;
+
+header span {
+  display: flex;
+  gap: 0.5em;
+}
+
+.redondo {
+  border-radius: 100%;
+  padding: 6px 10px 6px 10px;
 }
 </style>

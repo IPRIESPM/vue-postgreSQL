@@ -102,8 +102,8 @@ export async function updateContactFromApi(data) {
   }
 }
 
-export async function deleteCompanyFromApi(cif) {
-  const url = serverPath + cif;
+export async function deleteContactFromApi(n) {
+  const url = serverPath + n;
 
   try {
     const response = await fetch(url, {

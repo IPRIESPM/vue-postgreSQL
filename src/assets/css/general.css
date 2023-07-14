@@ -84,3 +84,8 @@ div.loading{
     opacity: 0.5;
     pointer-events: none;
 }
+
+.underline{
+    text-decoration: underline;
+    cursor: pointer;
+}

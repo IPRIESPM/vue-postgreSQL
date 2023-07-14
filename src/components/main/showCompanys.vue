@@ -33,8 +33,10 @@
               <td :class="{ 'empty': !company.cif }">
               <span>{{ company.cif }}</span>
             </td>
-              <td :class="{ 'empty': !company.nombre }" @click="goProfile(company.cif)">
-
+              <td
+                class="underline"
+                :class="{ 'empty': !company.nombre }" @click="goProfile(company.cif)"
+              >
               <span>
                 <font-awesome-icon :icon="['fas', 'address-card']" />
                 {{ company.nombre }}
