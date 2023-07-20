@@ -98,6 +98,11 @@
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
           </button>
+          <RoundedButton
+            :modal=showModal
+            :class="{ 'modal': showModal }"
+            class="contacts"
+            @click="buttonAdd('close')"/>
         </section>
       </form>
 
@@ -166,6 +171,11 @@
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
           </button>
+          <RoundedButton
+            :modal=showModal
+            :class="{ 'modal': showModal }"
+            class="position"
+            @click="buttonAdd('close')"/>
         </section>
       </form>
 
@@ -213,7 +223,7 @@
         </section>
 
         <fieldset>
-          <label for="descrip">Anotacion</label>
+          <label for="descrip">Anotación</label>
           <textarea name="descrip" id="descrip" cols="30" rows="10"></textarea>
         </fieldset>
 
@@ -223,15 +233,10 @@
             Cancelar
           </button>
         </section>
-        <button
-          type="button"
-          :class="{ puestos: modalType == 'puestos' }"
-          class="add position"
-          @click="buttonAdd('close')"
-        >
-          <font-awesome-icon v-if="showModal" :icon="['fas', 'xmark']" />
-          <font-awesome-icon v-else :icon="['fas', 'plus']" />
-        </button>
+        <RoundedButton
+        :modal="showModal"
+        class="annotations"
+        @click="buttonAdd('close')"/>
       </form>
 
     </section>
@@ -258,9 +263,7 @@
     <section class="contacts">
       <header>
         <h2>Contactos</h2>
-        <button type="button" class="redondo" @click="buttonAdd('contactos')">
-          <font-awesome-icon :icon="['fas', 'plus']" />
-        </button>
+        <RoundedButton :modal=false @click="buttonAdd('contactos')"/>
       </header>
       <section class="contact-data" v-if="contacts && contacts.length > 0">
         <table>
@@ -293,9 +296,7 @@
         <section class="anotaciones">
           <header>
           <h3>Anotaciones</h3>
-          <button type="button" class="redondo" @click="buttonAdd('anotaciones')">
-            <font-awesome-icon :icon="['fas', 'plus']" />
-          </button>
+          <RoundedButton :modal=showModal @click="buttonAdd('anotaciones')"/>
         </header>
           <section
             v-if="profile.anotaciones"
@@ -307,17 +308,12 @@
       </section>
       <section class="noData" v-else>
         <p>No hay contactos 😢</p>
-        <button type="button" class="redondo" @click="buttonAdd('contactos')">
-          <font-awesome-icon :icon="['fas', 'plus']" />
-        </button>
       </section>
     </section>
     <section class="puestos">
       <header>
         <h2>Puestos</h2>
-        <button type="button" class="redondo" @click="buttonAdd('puestos')">
-          <font-awesome-icon :icon="['fas', 'plus']" />
-        </button>
+        <RoundedButton :modal=showModal @click="buttonAdd('puestos')"/>
       </header>
       <ul v-if="puestos && puestos.length > 0">
         <li v-for="puesto in puestos" :key="puesto.cod">
@@ -340,6 +336,7 @@ import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
 import StandardButton from '../buttons/standardButton.vue';
+import RoundedButton from '../buttons/roundedButton.vue';
 import {
   newContact,
   updateContactFromApi,
@@ -355,7 +352,7 @@ const profile = ref('');
 const contacts = ref('');
 const puestos = ref('');
 
-const errorMesages = ref('');
+const errorMessages = ref('');
 
 const anyoActual = new Date().getFullYear();
 const fechaActual = ref(new Date().toISOString().split('T')[0]);
@@ -403,14 +400,13 @@ const resetFromData = () => {
     vacantes: '',
     horario: '',
     ciclo: '',
-    descripcion: '',
+    descripción: '',
   };
 };
 
 const getCompanyProfile = async () => {
   console.log('Actualizando datos');
   const profileApi = await companyProfile(companyStored.getEmpresaSelected);
-  console.log('El perfil es:', profileApi.contactos);
   rawData.value = profileApi;
   profile.value = profileApi.empresa;
   contacts.value = profileApi.contactos;
@@ -451,7 +447,7 @@ const onSubmitContact = async (event) => {
     editMode.value = false;
   } else {
     loading.value = false;
-    errorMesages.value = 'Error al añadir el contacto';
+    errorMessages.value = 'Error al añadir el contacto';
   }
 };
 
@@ -467,7 +463,7 @@ const deleteContact = async (contactN) => {
   if (response) {
     await getCompanyProfile();
   } else {
-    errorMesages.value = 'Error al eliminar el contacto';
+    errorMessages.value = 'Error al eliminar el contacto';
   }
 };
 onBeforeMount(() => {
@@ -517,20 +513,6 @@ p.encargado {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-button.add {
-  border-radius: 100%;
-  position: absolute;
-  transform: translateX(480px) translateY(-780px);
-}
-
-button.add.position {
-  transform: translateX(455px) translateY(-25px);
-}
-
-button.add.notes {
-  transform: translateX(220px) translateY(-310px);
 }
 section.header {
   margin-bottom: 1.5em;
@@ -607,8 +589,19 @@ header span {
   gap: 0.5em;
 }
 
-.redondo {
-  border-radius: 100%;
-  padding: 6px 10px 6px 10px;
+button.add.contacts{
+  position: absolute;
+  top: 4.2em;
+  right: 21.3em;
+}
+button.add.annotations{
+  position: absolute;
+  top: 7.2em;
+  right: 22.3em;
+}
+button.add.position{
+  position: absolute;
+  top: 7em;
+  right: 21.3em;
 }
 </style>
