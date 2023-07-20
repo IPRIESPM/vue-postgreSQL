@@ -145,6 +145,10 @@ form#userForm{
     color: var(--color-text);
 }
 
+form#userForm{
+  width: 100%;
+}
+
 section.userProfile .userInfo{
     display: flex;
     align-items: center;
