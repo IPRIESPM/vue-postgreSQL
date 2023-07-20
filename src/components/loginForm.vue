@@ -6,7 +6,7 @@ import userStore from '../store/user';
 
 import logoSvg from '../assets/svg/Logo.svg';
 import login from '../controllers/session';
-import submitButton from './submitButton.vue';
+import submitButton from './buttons/submitButton.vue';
 
 const router = useRouter();
 const loading = ref(false);

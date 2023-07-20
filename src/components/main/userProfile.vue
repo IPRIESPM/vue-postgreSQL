@@ -80,7 +80,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import userStore from '../../store/user';
-import submitButton from '../submitButton.vue';
+import submitButton from '../buttons/submitButton.vue';
 import { editData } from '../../controllers/data';
 
 const storedUser = userStore();

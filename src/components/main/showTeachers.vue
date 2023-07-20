@@ -146,11 +146,14 @@
           </section>
         </section>
       </form>
-      <button type="button" class="add variant" @click="buttonAdd">
-        <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
-        <font-awesome-icon v-else :icon="['fas', 'plus']" />
-      </button>
+      <button type="button" class="add variant"
+        :class="{'edit': modalOption === 'edit'}"
+        @click="buttonAdd">
+          <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
+          <font-awesome-icon v-else :icon="['fas', 'plus']" />
+        </button>
     </section>
+
     <button type="button" class="add" @click="buttonAdd">
       <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
       <font-awesome-icon v-else :icon="['fas', 'plus']" />
@@ -160,9 +163,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+import submitButton from '../buttons/submitButton.vue';
 import { getAllData, editData, deleteData } from '../../controllers/data';
 import { newTeacher } from '../../controllers/api/teachers';
-import submitButton from '../submitButton.vue';
 
 import profesoresStore from '../../store/profesores';
 import userStore from '../../store/user';
@@ -321,7 +324,8 @@ button.add {
 
 button.add.variant {
   position: relative;
-  top: -262px;
+  top: -200px;
+  right: 20px;
   border-radius: 100%;
   outline: none;
   border: none;

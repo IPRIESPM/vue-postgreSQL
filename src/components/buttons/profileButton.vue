@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import Cookie from 'js-cookie';
 import { useRouter } from 'vue-router';
-import userStore from '../store/user';
+import userStore from '../../store/user';
 
 const router = useRouter();
 const navVisible = ref(false);
@@ -22,8 +22,8 @@ const destroyCookie = () => {
 
 onMounted(async () => {
   const storedUser = Store.getUser;
-  console.log(storedUser);
   user.value = storedUser;
+  if (!storedUser.dni) destroyCookie();
 });
 
 const navigateTo = (route) => {

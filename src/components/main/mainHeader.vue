@@ -1,6 +1,6 @@
 <script setup>
 import { defineProps } from 'vue';
-import ProfileButton from '../profileButton.vue';
+import ProfileButton from '../buttons/profileButton.vue';
 
 const props = defineProps({
   title: {

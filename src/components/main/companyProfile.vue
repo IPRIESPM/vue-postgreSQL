@@ -223,17 +223,18 @@
             Cancelar
           </button>
         </section>
+        <button
+          type="button"
+          :class="{ puestos: modalType == 'puestos' }"
+          class="add position"
+          @click="buttonAdd('close')"
+        >
+          <font-awesome-icon v-if="showModal" :icon="['fas', 'xmark']" />
+          <font-awesome-icon v-else :icon="['fas', 'plus']" />
+        </button>
       </form>
+
     </section>
-    <button
-      type="button"
-      :class="{ puestos: modalType == 'puestos' }"
-      class="add puestos"
-      @click="buttonAdd('close')"
-    >
-      <font-awesome-icon v-if="showModal" :icon="['fas', 'xmark']" />
-      <font-awesome-icon v-else :icon="['fas', 'plus']" />
-    </button>
   </section>
   <section class="loading" v-if="loading">
     Cargando empresa
@@ -338,7 +339,7 @@ import { ref, onMounted, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
-import StandardButton from '../standardButton.vue';
+import StandardButton from '../buttons/standardButton.vue';
 import {
   newContact,
   updateContactFromApi,
@@ -521,15 +522,15 @@ p.encargado {
 button.add {
   border-radius: 100%;
   position: absolute;
-  transform: translateX(480%) translateY(-780%);
+  transform: translateX(480px) translateY(-780px);
 }
 
-button.add.puestos {
-  transform: translateX(430%) translateY(-640%);
+button.add.position {
+  transform: translateX(455px) translateY(-25px);
 }
 
-button.add.anotaciones {
-  transform: translateX(430%) translateY(-640%);
+button.add.notes {
+  transform: translateX(220px) translateY(-310px);
 }
 section.header {
   margin-bottom: 1.5em;
