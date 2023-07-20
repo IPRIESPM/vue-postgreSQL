@@ -7,6 +7,15 @@ button{
     outline: none;
 }
 
+textarea{
+    background: var(--color-background);
+    width: 100%;
+    padding: 15px;
+    color: var(--button-text);
+    border: 2px solid transparent ;
+    outline: none;
+}
+
 select {
     width: 100%;
     padding: 15px;
