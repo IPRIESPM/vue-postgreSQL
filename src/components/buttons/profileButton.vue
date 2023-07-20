@@ -57,6 +57,10 @@ button.profile-button {
   color: var(--color-text);
   width: max-content;
   height: 35px;
+
+}
+button.profile-button {
+  border: none !important;
 }
 
 nav {

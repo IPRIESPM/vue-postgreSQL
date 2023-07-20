@@ -1,10 +1,26 @@
 input,
-button {
+button{
     width: max-content;
+    padding: 15px;
+    color: var(--button-text);
+    border: 2px solid transparent ;
+    outline: none;
+}
+
+select {
+    width: 100%;
     padding: 15px;
     color: var(--button-text);
     border: 2px solid transparent;
     outline: none;
+    background: var(--color-background);
+}
+
+input:focus,
+button:focus,
+select:focus {
+    border: 2px solid var(--button-text-muted) !important;
+    transition: border 0.3s ease;
 }
 
 input:not([type="submit"]),
@@ -65,19 +81,26 @@ button[type="button"].loading {
     gap: 10px;
 }
 
-select {
-    width: 100%;
-    padding: 15px;
-    color: var(--button-text);
-    border: 2px solid transparent;
-    outline: none;
-    background: var(--color-background);
-}
 
-
-
-input[type="checkbox"] {
+input[type="checkbox"],
+input[type="checkbox"]:checked {
     width: 20px;
     height: 20px;
     margin-right: 10px;
+    background: var(--color-background);
+    accent-color: var(--color-background);
+}
+
+input[type="checkbox"]::before{
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: var(--color-background);
+    accent-color: var(--color-background);
+    border: 2px solid var(--button-text-muted);
+    border-radius: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: border 0.3s ease;
 }
