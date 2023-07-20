@@ -147,6 +147,7 @@ form#userForm{
 
 form#userForm{
   width: 100%;
+  background-color: inherit;
 }
 
 section.userProfile .userInfo{
