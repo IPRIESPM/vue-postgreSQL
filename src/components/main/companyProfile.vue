@@ -243,10 +243,6 @@
 
     </section>
   </section>
-  <section class="loading" v-if="loading">
-    Cargando empresa
-    <div class="loading"></div>
-  </section>
   <section class="main" v-else>
     <header>
       <h1>{{ profile.nombre }} - {{ profile.cif }}</h1>

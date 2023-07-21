@@ -1,6 +1,6 @@
 <template>
      <button v-if="loading" type="button" class="loading" :class="{ 'is-rounded': rounded }">
-        <span>{{loadingText}} es:{{ rounded }}</span>
+        <span>{{loadingText}}</span>
         <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
       </button>
       <input v-else type="submit" :value="idleText">
