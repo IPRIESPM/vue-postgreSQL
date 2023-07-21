@@ -148,7 +148,7 @@
 
             <fieldset>
               <label for="profesor">Profesor a cargo</label>
-              <select name="profesor" id="profesor">
+              <select name="profesor" id="profesor" v-if="teachersData.length !== 0">
                 <option :value="teacher.dni"
                   v-if="modalOption !== 'edit'"
                   v-for="teacher in teachersData"
@@ -165,6 +165,11 @@
                   </option>
 
               </select>
+              <LoadingText
+                v-else
+                :loading="true"
+                loadingText="Cargando profesores"
+              />
             </fieldset>
           </section>
           <section class="buttons">
@@ -194,6 +199,7 @@ import { useRouter } from 'vue-router';
 import { getAllData, editData, deleteData } from '../../controllers/data';
 import { newCompany } from '../../controllers/api/companys';
 import submitButton from '../buttons/submitButton.vue';
+import LoadingText from '../loading/loadingText.vue';
 import profesoresStore from '../../store/profesores';
 import companyStore from '../../store/empresas';
 import userStore from '../../store/user';
@@ -238,11 +244,11 @@ async function updateData(force = false) {
   loading.value = false;
 }
 
-const showHideModal = () => {
+const showHideModal = async () => {
   modal.value = !modal.value;
   if (modal.value) {
     console.log('actualizando profesores: ');
-    getAllData('teachers', 'force');
+    await getAllData('teachers', 'force');
     teachersData.value = teacherStored.getProfesores.listado;
   }
 };
