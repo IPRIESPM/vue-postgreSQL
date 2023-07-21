@@ -25,8 +25,8 @@
                 name="nombre"
                 id="nombre"
                 placeholder="Silvia Amorós"
-                required
                 v-model="newContactData.nombre"
+                autofocus
               />
             </fieldset>
           </section>
@@ -234,9 +234,11 @@
           </button>
         </section>
         <RoundedButton
-        :modal="showModal"
-        class="annotations"
-        @click="buttonAdd('close')"/>
+            :modal=showModal
+            :class="{ 'modal': showModal }"
+            class="annotations"
+            @click="buttonAdd('close')"
+          />
       </form>
 
     </section>
@@ -263,7 +265,11 @@
     <section class="contacts">
       <header>
         <h2>Contactos</h2>
-        <RoundedButton :modal=false @click="buttonAdd('contactos')"/>
+        <RoundedButton
+          :modal=false
+          @click="buttonAdd('contactos')"
+          shadow="false"
+        />
       </header>
       <section class="contact-data" v-if="contacts && contacts.length > 0">
         <table>
@@ -296,7 +302,12 @@
         <section class="anotaciones">
           <header>
           <h3>Anotaciones</h3>
-          <RoundedButton :modal=showModal @click="buttonAdd('anotaciones')"/>
+          <RoundedButton
+            shadow="false"
+            :modal=showModal
+            @click="buttonAdd('anotaciones')"
+            size="sm"
+          />
         </header>
           <section
             v-if="profile.anotaciones"
@@ -313,7 +324,10 @@
     <section class="puestos">
       <header>
         <h2>Puestos</h2>
-        <RoundedButton :modal=showModal @click="buttonAdd('puestos')"/>
+        <RoundedButton
+          :modal=showModal
+          shadow="false"
+          @click="buttonAdd('puestos')"/>
       </header>
       <ul v-if="puestos && puestos.length > 0">
         <li v-for="puesto in puestos" :key="puesto.cod">

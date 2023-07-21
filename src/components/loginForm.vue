@@ -11,11 +11,11 @@
 
       <fieldset>
         <label for="dni">DNI del usuario</label>
-        <input type="text" name="dni" id="dni" placeholder="11111111T" required formnovalidate>
+        <input type="text" name="dni" id="dni" placeholder="11111111T">
       </fieldset>
       <fieldset>
         <label for="password">Contraseña</label>
-        <input type="password" name="contrasena" id="password" placeholder="********" required formnovalidate>
+        <input type="password" name="contrasena" id="password" placeholder="********" >
       </fieldset>
 
       <submitButton
@@ -25,12 +25,6 @@
         @click="submitForm"
         formnovalidate
       />
-
-      <!-- <button v-if="loading" type="button" class="loading">
-        <span>Iniciando</span>
-        <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
-      </button>
-      <input v-else type="submit" value="Acceder"> -->
     </form>
   </section>
 </template>
@@ -65,6 +59,8 @@ const onSubmit = async (event) => {
   try {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
+    if (!data.dni || !data.contrasena) throw new Error('Faltan datos en el formulario.');
+
     const loginData = await login(data);
     console.log(loginData, 'loginData');
     await Cookies.set('token', loginData.token, { expires: 7 });
@@ -82,11 +78,14 @@ const onSubmit = async (event) => {
     } else {
       formInputs.forEach((input) => {
         const modifiedInput = input;
+        if (modifiedInput.value === '') {
+          modifiedInput.setCustomValidity('Este campo es obligatorio.');
+        }
         modifiedInput.valid = false;
       });
       console.error('Error en la solicitud de inicio de sesión:', error.message);
       dataError.value.error = true;
-      dataError.value.message = 'Error en la solicitud de inicio de sesión.';
+      dataError.value.message = error.message;
     }
   } finally {
     loading.value = false;
