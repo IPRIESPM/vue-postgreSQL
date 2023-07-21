@@ -605,17 +605,14 @@ header span {
 
 button.add.contacts{
   position: absolute;
-  top: 80px;
-  right: 428px;
+  transform: translate(239px, -700px);
 }
 button.add.annotations{
   position: absolute;
-  top: 130px;
-  right: 448px;
+  transform: translate(400px, -650px);
 }
 button.add.position{
   position: absolute;
-  top: 130px;
-  right: 428px;
+  transform: translate(240px, -600px);
 }
 </style>

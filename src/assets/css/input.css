@@ -33,8 +33,9 @@ select:focus {
 }
 
 input:not([type="submit"]),
-input:not([type="button"]) {
-    background: var(--color-background);
+input:not([type="button"]){
+
+    background: var(--color-background) !important;
 }
 
 input:not(:focus):invalid:not([type="submit"]),
@@ -42,6 +43,7 @@ input:not(:focus):invalid:not([type="button"]) {
     border: 2px solid var(--color-error);
     animation: bounce 0.5s 1 linear forwards;
 }
+
 
 input[type="submit"],
 input[type="button"],
