@@ -591,17 +591,17 @@ header span {
 
 button.add.contacts{
   position: absolute;
-  top: 4.2em;
-  right: 21.3em;
+  top: 80px;
+  right: 428px;
 }
 button.add.annotations{
   position: absolute;
-  top: 7.2em;
-  right: 22.3em;
+  top: 130px;
+  right: 448px;
 }
 button.add.position{
   position: absolute;
-  top: 7em;
-  right: 21.3em;
+  top: 130px;
+  right: 428px;
 }
 </style>

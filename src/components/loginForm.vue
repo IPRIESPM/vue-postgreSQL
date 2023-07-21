@@ -1,3 +1,40 @@
+<template>
+  <section class="loginForm">
+    <figure>
+      <img :src="logoSvg" alt="Logo">
+      <h1>CRM</h1>
+    </figure>
+    <section class="error-message" :class="{ 'error-class': dataError.error }">
+      <p v-if="dataError.error">{{ dataError.message }}</p>
+    </section>
+    <form @submit.prevent="onSubmit" id="logging" novalidate >
+
+      <fieldset>
+        <label for="dni">DNI del usuario</label>
+        <input type="text" name="dni" id="dni" placeholder="11111111T" required formnovalidate>
+      </fieldset>
+      <fieldset>
+        <label for="password">Contraseña</label>
+        <input type="password" name="contrasena" id="password" placeholder="********" required formnovalidate>
+      </fieldset>
+
+      <submitButton
+        :loading="loading"
+        idleText="Acceder"
+        loadingText="Iniciando"
+        @click="submitForm"
+        formnovalidate
+      />
+
+      <!-- <button v-if="loading" type="button" class="loading">
+        <span>Iniciando</span>
+        <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
+      </button>
+      <input v-else type="submit" value="Acceder"> -->
+    </form>
+  </section>
+</template>
+
 <script setup>
 import Cookies from 'js-cookie';
 import { useRouter } from 'vue-router';
@@ -67,42 +104,6 @@ onMounted(() => {
   });
 });
 </script>
-
-<template>
-  <section class="loginForm">
-    <figure>
-      <img :src="logoSvg" alt="Logo">
-      <h1>CRM</h1>
-    </figure>
-    <section class="error-message" :class="{ 'error-class': dataError.error }">
-      <p v-if="dataError.error">{{ dataError.message }}</p>
-    </section>
-    <form @submit.prevent="onSubmit" id="logging">
-
-      <fieldset>
-        <label for="dni">DNI del usuario</label>
-        <input type="text" name="dni" id="dni" placeholder="11111111T" required>
-      </fieldset>
-      <fieldset>
-        <label for="password">Contraseña</label>
-        <input type="password" name="contrasena" id="password" placeholder="********" required>
-      </fieldset>
-
-      <submitButton
-        :loading="loading"
-        idleText="Acceder"
-        loadingText="Iniciando"
-        @click="submitForm"
-      />
-
-      <!-- <button v-if="loading" type="button" class="loading">
-        <span>Iniciando</span>
-        <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
-      </button>
-      <input v-else type="submit" value="Acceder"> -->
-    </form>
-  </section>
-</template>
 
 <style scoped>
 section.loginForm {
