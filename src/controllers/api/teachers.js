@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+
 const serverPath = 'http://vps-3258627-x.dattaweb.com:8084/api/profesor/';
 export async function getAllTeachersFromApi(version) {
   const url = serverPath;
@@ -58,20 +59,18 @@ export async function newTeacher(data) {
   }
 }
 
-
-
 export async function updateTeacherFromApi(data) {
   const {
-    dni, nombre, correo, telefono, contrasena
+    dni, nombre, correo, telefono, contrasena,
   } = data;
 
   const url = serverPath + dni;
-  console.log("estoy mandando datos aquí" + url)
+  console.log(`estoy mandando datos aquí${url}`);
   try {
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
-        dni, nombre, correo, telefono, contrasena
+        dni, nombre, correo, telefono, contrasena,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +91,7 @@ export async function updateTeacherFromApi(data) {
 
 export async function deleteTeacherFromApi(dni) {
   const url = serverPath + dni;
-  console.log("estoy mandando datos aqui" + url);
+  console.log(`estoy mandando datos aqui${url}`);
   try {
     const response = await fetch(url, {
       method: 'DELETE',

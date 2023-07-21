@@ -28,8 +28,7 @@ export default defineStore('empresas', {
     updateEmpresa(empresa) {
       console.log('updateEmpresa', empresa);
       const index = this.listado.findIndex((e) => e.cif === empresa.cif);
-      console.log("estoy guardando", this.listado[index]);
-      //this.listado[index] = empresa;
+      console.log('estoy guardando', this.listado[index]);
     },
     deleteEmpresa(cif) {
       const index = this.listado.findIndex((e) => e.cif === cif);

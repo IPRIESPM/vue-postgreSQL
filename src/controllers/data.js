@@ -14,8 +14,7 @@ import {
 } from '../store/storage';
 
 export async function getAllData(section, force = false) {
-  const localData = getLocalData(section);
-
+  const localData = await getLocalData(section);
   const { version, listado } = localData;
   let update = false;
   if (!listado.length > 0) update = true;
@@ -34,12 +33,10 @@ export async function getAllData(section, force = false) {
   if (section === 'teachers') data = await getAllTeachersFromApi(version);
   if (section === 'companys') data = await getAllCompanysFromApi(version);
 
-  console.log('guardamos los datos en pinia', data);
-  setLocalData(section, data);
   if (data === 304) return localData;
-
   if (!data) return localData;
 
+  setLocalData(section, data);
   return true;
 }
 

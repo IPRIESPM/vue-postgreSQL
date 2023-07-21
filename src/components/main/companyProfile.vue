@@ -179,7 +179,7 @@
         </section>
       </form>
 
-      <form v-if="modalType === 'anotaciones'">
+      <form v-if="modalType === 'anotaciones'" @submit="onSubmit">
         <section class="header">
           <h2>Añadir anotación</h2>
         </section>
@@ -243,7 +243,7 @@
 
     </section>
   </section>
-  <section class="main" v-else>
+  <section class="main" v-else-if="!loading">
     <header>
       <h1>{{ profile.nombre }} - {{ profile.cif }}</h1>
       <span>
@@ -308,7 +308,9 @@
           <section
             v-if="profile.anotaciones"
             class="anotaciones-data"
-          ></section>
+          >
+            <p>{{ profile.anotaciones }}</p>
+          </section>
           <section v-else class="noData">No hay anotaciones 😢</section>
           <p>{{ profile.anotaciones }}</p>
         </section>
@@ -339,6 +341,7 @@
       </section>
     </section>
   </section>
+  <LoadingText v-else />
 </template>
 <script setup>
 import { ref, onMounted, onBeforeMount } from 'vue';
@@ -352,6 +355,7 @@ import {
   updateContactFromApi,
   deleteContactFromApi,
 } from '../../controllers/api/contactats';
+import LoadingText from '../loading/loadingText.vue';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -460,7 +464,9 @@ const onSubmitContact = async (event) => {
     errorMessages.value = 'Error al añadir el contacto';
   }
 };
-
+const onSubmit = async (event) => {
+  event.preventDefault();
+};
 const editContact = async (contactN) => {
   newContactData.value = {
     ...contacts.value.find((contact) => contact.n === contactN),

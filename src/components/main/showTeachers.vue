@@ -76,7 +76,6 @@
                 id="dni"
                 placeholder="A12345678"
                 v-model="dataSelected.dni"
-                required
                 :readonly="modalOption === 'edit'"
               >
             </fieldset>
@@ -87,7 +86,6 @@
                 name="nombre"
                 id="nombre"
                 placeholder="Alejandro"
-                required
                 v-model="dataSelected.nombre"
               >
             </fieldset>
@@ -98,7 +96,6 @@
                 name="contrasena"
                 id="contrasena"
                 placeholder="*******"
-                required
               >
             </fieldset>
           </section>
@@ -110,7 +107,6 @@
                 name="telefono"
                 id="telefono"
                 placeholder="965331234"
-                required
                 v-model="dataSelected.telefono"
               >
             </fieldset>
@@ -121,7 +117,7 @@
                 name="correo"
                 id="correo"
                 placeholder="example@example.com"
-                required
+                novalidate
                 v-model="dataSelected.correo"
               >
             </fieldset>
@@ -196,6 +192,7 @@ async function updateData(force = false) {
   }
   await getAllData('teachers', force);
 
+  console.log('store.getProfesores.listado', store.getProfesores.listado);
   localData.value = store.getProfesores.listado;
   loading.value = false;
 }
@@ -238,6 +235,15 @@ const onSubmit = async (event) => {
   submitLoading.value = true;
   const formData = new FormData(event.target);
   const data = Object.fromEntries(formData.entries());
+  const { dni, nombre, contrasena } = data;
+
+  if (!dni || !nombre || !contrasena) {
+    errorMessage.value = 'Faltan datos en el formulario';
+    submitError.value = true;
+    submitLoading.value = false;
+    event.target.classList.add('bounce');
+    return;
+  }
 
   let responseData;
 

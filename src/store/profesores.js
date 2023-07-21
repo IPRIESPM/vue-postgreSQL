@@ -30,11 +30,10 @@ export default defineStore('profesores', {
       this.listado[index] = profesor;
     },
     deleteProfesor(dni) {
-
       const index = this.listado.findIndex((p) => p.dni === dni);
-      console.log("Profesor", dni);
-      console.log("index", index);
-      console.log("listado", this.listado);
+      console.log('Profesor', dni);
+      console.log('index', index);
+      console.log('listado', this.listado);
       this.listado.splice(index, 1);
     },
   },
