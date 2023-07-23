@@ -3,7 +3,6 @@
 import Cookie from 'js-cookie';
 import { useRouter } from 'vue-router';
 import LoginForm from '../components/loginForm.vue';
-import NewProfesor from '../components/newProfesor.vue';
 
 const router = useRouter();
 

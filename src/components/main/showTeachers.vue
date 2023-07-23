@@ -241,7 +241,18 @@ const onSubmit = async (event) => {
     errorMessage.value = 'Faltan datos en el formulario';
     submitError.value = true;
     submitLoading.value = false;
-    event.target.classList.add('bounce');
+    if (!dni) {
+      const input = event.target.querySelector('input[name="dni"]');
+      input.setCustomValidity('Tienes que introducir un dni');
+    }
+    if (!nombre) {
+      const input = event.target.querySelector('input[name="nombre"]');
+      input.setCustomValidity('Tienes que introducir un nombre');
+    }
+    if (!contrasena) {
+      const input = event.target.querySelector('input[name="contrasena"]');
+      input.setCustomValidity('Tienes que introducir una contraseña');
+    }
     return;
   }
 
