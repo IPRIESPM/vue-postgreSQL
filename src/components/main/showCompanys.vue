@@ -75,14 +75,14 @@
         <section class="container">
           <section class="personal">
             <fieldset>
-              <label for="dni">Cif</label>
+              <label for="cif">Cif</label>
               <input
                 type="text"
                 name="cif"
                 id="cif"
                 placeholder="A12345678"
                 v-model="dataSelected.cif"
-                required
+                @change="onChange"
               >
             </fieldset>
             <fieldset>
@@ -92,8 +92,8 @@
                 name="nombre"
                 id="nombre"
                 placeholder="Empresa S.L."
-                required
                 v-model="dataSelected.nombre"
+                @change="onChange"
               >
             </fieldset>
             <fieldset>
@@ -103,7 +103,6 @@
                 name="telefono"
                 id="telefono"
                 placeholder="965331234"
-                required
                 v-model="dataSelected.telefono"
               >
             </fieldset>
@@ -116,7 +115,6 @@
                 name="direccion"
                 id="direccion"
                 placeholder="Calle de la piruleta, 123"
-                required
                 v-model="dataSelected.direccion"
               >
             </fieldset>
@@ -128,7 +126,6 @@
                 name="localidad"
                 id="localidad"
                 placeholder="Petrer"
-                required
                 v-model="dataSelected.localidad"
               >
             </fieldset>
@@ -139,7 +136,6 @@
                 name="comunidad"
                 id="comunidad"
                 placeholder="Alicante"
-                required
                 v-model="dataSelected.comunidad"
               >
             </fieldset>
@@ -148,7 +144,11 @@
 
             <fieldset>
               <label for="profesor">Profesor a cargo</label>
-              <select name="profesor" id="profesor" v-if="teachersData.length !== 0">
+              <select
+                name="profesor" id="profesor"
+                v-if="teachersData.length !== 0"
+                @change="onChange"
+              >
                 <option :value="teacher.dni"
                   v-if="modalOption !== 'edit'"
                   v-for="teacher in teachersData"
@@ -286,6 +286,10 @@ const buttonAdd = () => {
   }
 };
 
+const onChange = (event) => {
+  event.target.setCustomValidity('');
+};
+
 const onSubmit = async (event) => {
   event.preventDefault();
   submitLoading.value = true;
@@ -307,6 +311,39 @@ const onSubmit = async (event) => {
 
     submitLoading.value = false;
   } else {
+    const inputNames = ['cif', 'nombre'];
+    const inputCustomValidity = {
+      cif: 'Tiene que ser un cif válido',
+      nombre: 'Tienes que introducir un nombre',
+      profesor: 'Selecciona un profesor',
+    };
+    const select = event.target.querySelector('select[name="profesor"]');
+    if (!select.value) {
+      select.setCustomValidity(inputCustomValidity.profesor);
+      submitError.value = true;
+      submitLoading.value = false;
+      event.target.classList.add('bounce');
+    } else {
+      select.setCustomValidity('');
+    }
+    inputNames.forEach((inputName) => {
+      const input = event.target.querySelector(`input[name="${inputName}"]`);
+
+      if (!input.value) {
+        input.setCustomValidity(inputCustomValidity[inputName]);
+        submitError.value = true;
+        submitLoading.value = false;
+        event.target.classList.add('bounce');
+      } else {
+        input.setCustomValidity('');
+      }
+    });
+
+    if (submitError.value) {
+      console.log('Hay errores en el formulario');
+      return;
+    }
+
     console.log('Estoy creando una nueva empresa');
     responseData = await newCompany(data);
     if (responseData) {

@@ -194,8 +194,6 @@ async function updateData(force = false) {
     console.log('Forzando actualización de datos');
   }
   await getAllData('teachers', force);
-
-  console.log('store.getProfesores.listado', store.getProfesores.listado);
   localData.value = store.getProfesores.listado;
   loading.value = false;
 }
