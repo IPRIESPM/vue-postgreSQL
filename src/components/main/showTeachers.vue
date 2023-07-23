@@ -223,9 +223,26 @@ const updateButton = async () => {
   updating.value = false;
 };
 
+const resetForm = () => {
+  dataSelected.value = {
+    dni: '', nombre: '', telefono: '', correo: '', contrasena: '',
+  };
+  errorMessage.value = '';
+  submitError.value = false;
+  submitLoading.value = false;
+  // form reset and inputcustomvalidity
+  const form = document.querySelector('#modalForm');
+  form.reset();
+  const formInputs = document.querySelectorAll('#modalForm input:not([type="submit"])');
+  formInputs.forEach((input) => {
+    input.setCustomValidity('');
+  });
+};
+
 const buttonAdd = () => {
   modal.value = !modal.value;
   if (modal.value) {
+    resetForm();
     modalOption.value = 'add';
     dataSelected.value = {
       dni: '', nombre: '', telefono: '', correo: '', contrasena: '',

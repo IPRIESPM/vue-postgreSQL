@@ -244,6 +244,19 @@ async function updateData(force = false) {
   loading.value = false;
 }
 
+function resetForm() {
+  submitError.value = false;
+  errorMessage.value = '';
+  const form = document.querySelector('#modalForm');
+  form.reset();
+  dataSelected.value = {};
+  form.classList.remove('bounce');
+  const formInputs = document.querySelectorAll('#modalForm input:not([type="submit"])');
+  formInputs.forEach((input) => {
+    input.setCustomValidity('');
+  });
+}
+
 const showHideModal = async () => {
   modal.value = !modal.value;
   if (modal.value) {
@@ -251,6 +264,8 @@ const showHideModal = async () => {
     await getAllData('teachers', 'force');
     teachersData.value = teacherStored.getProfesores.listado;
   }
+
+  resetForm();
 };
 
 function editFormData(id) {
