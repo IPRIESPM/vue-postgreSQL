@@ -230,7 +230,7 @@ const resetForm = () => {
   errorMessage.value = '';
   submitError.value = false;
   submitLoading.value = false;
-  // form reset and inputcustomvalidity
+
   const form = document.querySelector('#modalForm');
   form.reset();
   const formInputs = document.querySelectorAll('#modalForm input:not([type="submit"])');

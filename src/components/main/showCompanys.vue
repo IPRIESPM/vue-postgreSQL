@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
     <header>
       <button
@@ -150,6 +151,7 @@
                 @change="onChange"
               >
                 <option :value="teacher.dni"
+
                   v-if="modalOption !== 'edit'"
                   v-for="teacher in teachersData"
                   :key="teacher.dni"
