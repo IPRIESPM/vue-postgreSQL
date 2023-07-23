@@ -76,6 +76,7 @@
                 id="dni"
                 placeholder="A12345678"
                 v-model="dataSelected.dni"
+                @change="onChange"
                 :readonly="modalOption === 'edit'"
               >
             </fieldset>
@@ -85,6 +86,7 @@
                 type="text"
                 name="nombre"
                 id="nombre"
+                @change="onChange"
                 placeholder="Alejandro"
                 v-model="dataSelected.nombre"
               >
@@ -95,6 +97,7 @@
                 type="password"
                 name="contrasena"
                 id="contrasena"
+                @change="onChange"
                 placeholder="*******"
               >
             </fieldset>
@@ -226,33 +229,44 @@ const buttonAdd = () => {
   modal.value = !modal.value;
   if (modal.value) {
     modalOption.value = 'add';
-    dataSelected.value = {};
+    dataSelected.value = {
+      dni: '', nombre: '', telefono: '', correo: '', contrasena: '',
+    };
   }
+};
+const onChange = (event) => {
+  event.target.setCustomValidity('');
 };
 
 const onSubmit = async (event) => {
+  console.log(dataSelected.value.dni, dataSelected.value.nombre, dataSelected.value.contrasena);
   event.preventDefault();
+  submitError.value = false;
   submitLoading.value = true;
   const formData = new FormData(event.target);
   const data = Object.fromEntries(formData.entries());
   const { dni, nombre, contrasena } = data;
 
+  const inputNames = ['dni', 'nombre', 'contrasena'];
+  const inputCustomValidity = {
+    dni: 'Tienes que introducir un dni',
+    nombre: 'Tienes que introducir un nombre',
+    contrasena: 'Tienes que introducir una contraseña',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    if (!input.value) {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
   if (!dni || !nombre || !contrasena) {
     errorMessage.value = 'Faltan datos en el formulario';
     submitError.value = true;
     submitLoading.value = false;
-    if (!dni) {
-      const input = event.target.querySelector('input[name="dni"]');
-      input.setCustomValidity('Tienes que introducir un dni');
-    }
-    if (!nombre) {
-      const input = event.target.querySelector('input[name="nombre"]');
-      input.setCustomValidity('Tienes que introducir un nombre');
-    }
-    if (!contrasena) {
-      const input = event.target.querySelector('input[name="contrasena"]');
-      input.setCustomValidity('Tienes que introducir una contraseña');
-    }
     return;
   }
 
