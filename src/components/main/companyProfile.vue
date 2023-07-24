@@ -106,22 +106,22 @@
         </section>
       </form>
 
-      <form v-if="modalType === 'puestos'">
+      <form v-if="modalType === 'puestos'" @submit="onSubmitPositions">
         <section class="header">
           <h2>Añadir nuevos puestos</h2>
         </section>
         <section class="main">
           <section class="fieldset-group">
             <fieldset>
-              <label for="anyo">Año {{ newPuesto.anyo }}</label>
+              <label for="anyo">Año {{ newPositionData.anyo }}</label>
               <input
                 type="number"
                 name="anyo"
                 id="anyo"
                 required
                 min="2010"
-                :placeholder="anyoActual"
-                v-model="newPuesto.anyo"
+                :placeholder="actualYear"
+                v-model="newPositionData.anyo"
               />
             </fieldset>
             <fieldset>
@@ -132,7 +132,7 @@
                 id="vacantes"
                 placeholder="15"
                 min="0"
-                required
+                v-model="newPositionData.vacantes"
               />
             </fieldset>
           </section>
@@ -145,17 +145,24 @@
                 name="horario"
                 id="horario"
                 placeholder="9:00 - 14:00"
+                v-model="newPositionData.horario"
               />
             </fieldset>
             <fieldset>
               <label for="ciclo">Ciclo</label>
-              <select name="ciclo" id="ciclo">
-                <option value="FPB">FPB</option>
-                <option value="SMR">SMR</option>
-                <option value="DAM">DAM</option>
-                <option value="DAW">DAW</option>
-                <option value="ASIR">ASIR</option>
-                <option value="IMSA">IMSA</option>
+              <select name="ciclo" id="ciclo" v-model="newPositionData.ciclo">
+                <option
+                value="FPB" selected>FPB</option>
+                <option
+                value="SMR">SMR</option>
+                <option
+                value="DAM">DAM</option>
+                <option
+                value="DAW">DAW</option>
+                <option
+                value="ASIR">ASIR</option>
+                <option
+                value="IMSA">IMSA</option>
               </select>
             </fieldset>
           </section>
@@ -163,7 +170,14 @@
 
         <fieldset>
           <label for="descrip">Descripción</label>
-          <textarea name="descrip" id="descrip" cols="30" rows="10"></textarea>
+          <textarea
+            name="descrip"
+            id="descrip"
+            cols="30"
+            rows="10"
+            v-model="newPositionData.descripcion"
+            >
+          </textarea>
         </fieldset>
 
         <section class="button-group">
@@ -186,15 +200,15 @@
         <section class="main">
           <section class="fieldset-group">
             <fieldset>
-              <label for="anyo">Año {{ newPuesto.anyo }}</label>
+              <label for="anyo">Año {{ newPositionData.anyo }}</label>
               <input
                 type="number"
                 name="anyo"
                 id="anyo"
                 required
                 min="2010"
-                :placeholder="anyoActual"
-                v-model="newPuesto.anyo"
+                :placeholder="actualYear"
+                v-model="newPositionData.anyo"
               />
             </fieldset>
             <fieldset>
@@ -264,7 +278,7 @@
         <RoundedButton
           :modal=false
           @click="buttonAdd('contactos')"
-          shadow="false"
+          :shadow=false
         />
       </header>
       <section class="contact-data" v-if="contacts && contacts.length > 0">
@@ -299,7 +313,7 @@
           <header>
           <h3>Anotaciones</h3>
           <RoundedButton
-            shadow="false"
+            :shadow=false
             :modal=showModal
             @click="buttonAdd('anotaciones')"
             size="sm"
@@ -324,7 +338,7 @@
         <h2>Puestos</h2>
         <RoundedButton
           :modal=showModal
-          shadow="false"
+          :shadow=false
           @click="buttonAdd('puestos')"/>
       </header>
       <ul v-if="puestos && puestos.length > 0">
@@ -354,7 +368,8 @@ import {
   newContact,
   updateContactFromApi,
   deleteContactFromApi,
-} from '../../controllers/api/contactats';
+} from '../../controllers/api/contacts';
+import newPosition from '../../controllers/api/positions';
 import LoadingText from '../loading/loadingText.vue';
 
 const router = useRouter();
@@ -368,7 +383,7 @@ const puestos = ref('');
 
 const errorMessages = ref('');
 
-const anyoActual = new Date().getFullYear();
+const actualYear = new Date().getFullYear();
 const fechaActual = ref(new Date().toISOString().split('T')[0]);
 
 const showModal = ref(false);
@@ -389,15 +404,15 @@ const newContactData = ref({
   empresa: profile.value.cif,
 });
 
-const newPuesto = ref({
-  anyo: anyoActual,
+const newPositionData = ref({
+  anyo: actualYear,
   vacantes: '',
   horario: '',
   ciclo: '',
   descripcion: '',
 });
 
-const resetFromData = () => {
+const resetContactFromData = () => {
   newContactData.value = {
     n: '',
     dni: '',
@@ -409,8 +424,9 @@ const resetFromData = () => {
     funciones: '',
     empresa: profile.value.cif,
   };
-  newPuesto.value = {
-    anyo: anyoActual,
+
+  newPosition.value = {
+    anyo: actualYear,
     vacantes: '',
     horario: '',
     ciclo: '',
@@ -432,12 +448,27 @@ const buttonAdd = (type) => {
   if (type === 'close') {
     showModal.value = false;
     modalType.value = '';
-    resetFromData();
+    resetContactFromData();
     return;
   }
   console.log('La empresa es:', profile.value.cif);
   showModal.value = true;
   modalType.value = type;
+};
+
+const onSubmitPositions = async (event) => {
+  event.preventDefault();
+  loading.value = true;
+  const response = await newPosition(newPositionData.value);
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al añadir el contacto';
+  }
 };
 
 const onSubmitContact = async (event) => {
@@ -455,7 +486,7 @@ const onSubmitContact = async (event) => {
   if (response) {
     buttonAdd('close');
     loading.value = false;
-    resetFromData();
+    resetContactFromData();
     await getCompanyProfile();
 
     editMode.value = false;
@@ -464,9 +495,7 @@ const onSubmitContact = async (event) => {
     errorMessages.value = 'Error al añadir el contacto';
   }
 };
-const onSubmit = async (event) => {
-  event.preventDefault();
-};
+
 const editContact = async (contactN) => {
   newContactData.value = {
     ...contacts.value.find((contact) => contact.n === contactN),
@@ -474,6 +503,7 @@ const editContact = async (contactN) => {
   editMode.value = true;
   buttonAdd('contactos');
 };
+
 const deleteContact = async (contactN) => {
   const response = await deleteContactFromApi(contactN);
   if (response) {
@@ -482,6 +512,7 @@ const deleteContact = async (contactN) => {
     errorMessages.value = 'Error al eliminar el contacto';
   }
 };
+
 onBeforeMount(() => {
   if (companyStored.getEmpresaSelected === '') {
     router.push({ name: 'empresas' });
@@ -504,7 +535,9 @@ onMounted(async () => {
   }
   console.log('El tema es', document.documentElement.getAttribute('data-theme'));
 });
+
 </script>
+
 <style scoped>
 section.loading {
   display: flex;

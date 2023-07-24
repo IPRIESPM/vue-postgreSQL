@@ -1,5 +1,5 @@
 <template>
-  <button type="button" class="add" :class="[color, shadow ? '' : 'shadow']">
+  <button type="button" class="add" :class="[color, shadow ? 'shadow' : '']">
     <font-awesome-icon v-if="modal" :icon="['fas', 'xmark']" />
     <font-awesome-icon v-else :icon="['fas', 'plus']" />
   </button>
