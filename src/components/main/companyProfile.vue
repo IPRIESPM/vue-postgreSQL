@@ -90,7 +90,7 @@
 
         <section class="button-group">
           <StandardButton
-            rounded="true"
+            :rounded=true
             :idleText="editMode ? 'Editar' : 'Añadir'"
             :loading="loading"
             loadingText="Cargando"
@@ -151,18 +151,12 @@
             <fieldset>
               <label for="ciclo">Ciclo</label>
               <select name="ciclo" id="ciclo" v-model="newPositionData.ciclo">
-                <option
-                value="FPB" selected>FPB</option>
-                <option
-                value="SMR">SMR</option>
-                <option
-                value="DAM">DAM</option>
-                <option
-                value="DAW">DAW</option>
-                <option
-                value="ASIR">ASIR</option>
-                <option
-                value="IMSA">IMSA</option>
+                <option value="FPB">FPB</option>
+                <option value="SMR" selected>SMR</option>
+                <option value="DAM">DAM</option>
+                <option value="DAW">DAW</option>
+                <option value="ASIR">ASIR</option>
+                <option value="IMSA">IMSA</option>
               </select>
             </fieldset>
           </section>
@@ -408,8 +402,9 @@ const newPositionData = ref({
   anyo: actualYear,
   vacantes: '',
   horario: '',
-  ciclo: '',
+  ciclo: 'DAW',
   descripcion: '',
+  cod: selectedCompany,
 });
 
 const resetContactFromData = () => {
@@ -429,8 +424,9 @@ const resetContactFromData = () => {
     anyo: actualYear,
     vacantes: '',
     horario: '',
-    ciclo: '',
+    ciclo: 'DAW',
     descripción: '',
+    cod: selectedCompany,
   };
 };
 

@@ -5,13 +5,13 @@ const serverPath = 'http://vps-3258627-x.dattaweb.com:8084/api/puestos/';
 export default async function newPosition(data) {
   const url = serverPath;
   const {
-    anyo, ciclo, descripcion, horario, vacantes,
+    anyo, ciclo, descripcion, horario, vacantes, cod,
   } = data;
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        anyo, ciclo, descripcion, horario, vacantes,
+        anyo, ciclo, descripcion, horario, vacantes, cod,
       }),
       headers: {
         'Content-Type': 'application/json',
