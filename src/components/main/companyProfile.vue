@@ -1,10 +1,15 @@
 <template>
   <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }">
     <section class="modal-main">
+
       <form v-if="modalType === 'contactos'" @submit="onSubmitContact">
+
         <section class="header">
           <h2 v-if="editMode">Editar contacto</h2>
           <h2 v-else>Añadir nuevo contacto</h2>
+        </section>
+        <section class="error">
+          <p v-if="error">{{ errorMessages }}</p>
         </section>
         <section class="main">
           <section class="fieldset-group">
@@ -110,6 +115,9 @@
         <section class="header">
           <h2>Añadir nuevos puestos</h2>
         </section>
+        <section class="error">
+          <p v-if="error">{{ errorMessages }}</p>
+        </section>
         <section class="main">
           <section class="fieldset-group">
             <fieldset>
@@ -175,7 +183,11 @@
         </fieldset>
 
         <section class="button-group">
-          <StandardButton idleText="añadir" />
+          <SubmitButton
+            idleText="Añadir"
+            loadingText="Cargando"
+            :loading="loading"
+          />
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
           </button>
@@ -358,6 +370,7 @@ import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
 import StandardButton from '../buttons/standardButton.vue';
 import RoundedButton from '../buttons/roundedButton.vue';
+import SubmitButton from '../buttons/submitButton.vue';
 import {
   newContact,
   updateContactFromApi,
@@ -376,6 +389,7 @@ const contacts = ref('');
 const puestos = ref('');
 
 const errorMessages = ref('');
+const error = ref(false);
 
 const actualYear = new Date().getFullYear();
 const fechaActual = ref(new Date().toISOString().split('T')[0]);
@@ -408,6 +422,8 @@ const newPositionData = ref({
 });
 
 const resetContactFromData = () => {
+  error.value = false;
+  errorMessages.value = '';
   newContactData.value = {
     n: '',
     dni: '',
@@ -456,6 +472,30 @@ const onSubmitPositions = async (event) => {
   event.preventDefault();
   loading.value = true;
   const response = await newPosition(newPositionData.value);
+  console.log('respuesta del servidor', response);
+
+  const inputNames = [
+    'anyo',
+    'vacantes',
+    'horario'];
+
+  const inputCustomValidity = {
+    anyo: 'El año debe ser mayor a 2010',
+    vacantes: 'El número de vacantes debe ser >= a 0',
+    horario: 'Debes establecer un horario',
+    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newPositionData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
   if (response) {
     buttonAdd('close');
     loading.value = false;
@@ -463,7 +503,8 @@ const onSubmitPositions = async (event) => {
     await getCompanyProfile();
   } else {
     loading.value = false;
-    errorMessages.value = 'Error al añadir el contacto';
+    errorMessages.value = 'Error al registrar el puesto';
+    error.value = true;
   }
 };
 
@@ -472,6 +513,25 @@ const onSubmitContact = async (event) => {
   loading.value = true;
 
   let response;
+  const inputNames = [
+    'nombre',
+    'correo',
+    'telefono'];
+  const inputCustomValidity = {
+    nombre: 'Debes introducir un nombre',
+    correo: 'Debes introducir un correo',
+    telefono: 'Debes introducir un teléfono',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newContactData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
 
   if (editMode.value) {
     newContactData.value.empresa = profile.value.cif;
@@ -637,5 +697,11 @@ button.add.annotations{
 button.add.position{
   position: absolute;
   transform: translate(240px, -600px);
+}
+section.error {
+  color: var(--color-error);
+  text-align: center;
+  margin-bottom: 1rem;
+  height: 30px;
 }
 </style>
