@@ -522,14 +522,6 @@ onMounted(async () => {
     await getCompanyProfile();
     loading.value = false;
   }
-  const theme = document.documentElement.getAttribute('data-theme');
-  console.log('El tema es', theme);
-  if (theme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'light');
-  } else {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
-  console.log('El tema es', document.documentElement.getAttribute('data-theme'));
 });
 
 </script>

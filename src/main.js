@@ -10,6 +10,8 @@ import router from './router';
 import App from './App.vue';
 
 library.add(
+  solidIcons.faSun,
+  solidIcons.faMoon,
   solidIcons.faXmark,
   solidIcons.faBuilding,
   solidIcons.faMobile,

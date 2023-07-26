@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 import ProfileButton from '../buttons/profileButton.vue';
 
 const props = defineProps({
@@ -8,9 +8,12 @@ const props = defineProps({
     required: true,
   },
 });
+
 </script>
 <template>
+
     <header>
+
         <h2>{{ props.title == "dashboard" ? "Últimos movimientos" : props.title }}</h2>
         <ProfileButton  />
     </header>
@@ -23,4 +26,5 @@ const props = defineProps({
         justify-content: space-between;
         align-items: center;
     }
+
 </style>

@@ -51,20 +51,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--color-950);
-    --color-background-soft: var(--color-900);
-    --color-background-mute: var(--color-600);
+html[data-theme="dark"] {
+  --color-background: var(--color-950);
+  --color-background-soft: var(--color-900);
+  --color-background-mute: var(--color-600);
 
-    --color-text: var(--color-300);
+  --color-text: var(--color-300);
 
-    --color-border: var(--color-700);
+  --color-border: var(--color-700);
 
-    --button-background: var(--color-background-mute);
-    --button-background-hover: var(--color-background-soft);
-    --button-text:var( --color-text);
+  --button-background: var(--color-background-mute);
+  --button-background-hover: var(--color-background-soft);
+  --button-text:var( --color-text);
 
-    --button-text-muted:var( --color-text-muted);
-  }
+  --button-text-muted:var( --color-text-muted);
 }

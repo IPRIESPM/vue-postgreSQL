@@ -1,3 +1,25 @@
+<template>
+  <section>
+    <button class="button" @click="changeColorScheme">
+        <font-awesome-icon v-if="savedTheme === 'dark'" :icon="['fas', 'moon']" />
+        <font-awesome-icon v-else :icon="['fas', 'sun']"  />
+        <div class="slider round"></div>
+    </button>
+
+  <button class="profile-button" type="button" @click="showOptions" v-if="user">
+
+    <font-awesome-icon :icon="['fas', 'circle-user']" />
+    <span>{{ user.nombre }}</span>
+    <font-awesome-icon :icon="['fas', 'angle-up']" v-if="navVisible" />
+    <font-awesome-icon :icon="['fas', 'angle-down']" v-else />
+    <nav :class="{ 'show-nav': navVisible }">
+      <a @click="navigateTo('perfil')">Perfil</a>
+      <a @click="destroyCookie">Cerrar Sesión</a>
+    </nav>
+  </button>
+</section>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import Cookie from 'js-cookie';
@@ -30,22 +52,33 @@ const navigateTo = (route) => {
   console.log(route);
   router.push({ name: route });
 };
+
+const savedTheme = ref('light');
+
+const changeColorScheme = () => {
+  console.log('changeColorScheme');
+  const colorScheme = document.querySelector('html[data-theme]');
+  console.log('colorScheme', colorScheme.getAttribute('data-theme'));
+  const colorSchemeValue = colorScheme.getAttribute('data-theme');
+
+  if (colorSchemeValue === 'dark') {
+    colorScheme.setAttribute('data-theme', 'light');
+    savedTheme.value = 'light';
+  } else {
+    console.log('light');
+    colorScheme.setAttribute('data-theme', 'dark');
+    savedTheme.value = 'dark';
+  }
+};
 </script>
 
-<template>
-    <button class="profile-button" type="button" @click="showOptions" v-if="user">
-      <font-awesome-icon :icon="['fas', 'circle-user']" />
-      <span>{{ user.nombre }}</span>
-      <font-awesome-icon :icon="['fas', 'angle-up']" v-if="navVisible" />
-      <font-awesome-icon :icon="['fas', 'angle-down']" v-else />
-      <nav :class="{ 'show-nav': navVisible }">
-        <a @click="navigateTo('perfil')">Perfil</a>
-        <a @click="destroyCookie">Cerrar Sesión</a>
-      </nav>
-    </button>
-</template>
-
 <style scoped>
+section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
 button.profile-button {
   background-color: transparent;
   border: none;
@@ -90,4 +123,16 @@ nav.show-nav {
 nav a {
   font-size: 1em;
 }
+
+button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        width: 20px;
+        border: solid 1px transparent;
+    }
+button:focus {
+        outline: none;
+        border:solid 1px transparent !important;
+    }
 </style>
