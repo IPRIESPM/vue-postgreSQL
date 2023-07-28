@@ -3,7 +3,7 @@
         <span>{{loadingText}}</span>
         <font-awesome-icon :icon="['fas', 'arrows-rotate']" class="rotate" />
       </button>
-      <input v-else type="submit" :value="idleText">
+      <input v-else class="button" type="submit" :value="idleText">
 </template>
 <script setup>
 
@@ -16,4 +16,8 @@ defineProps({
 });
 
 </script>
-<style scoped></style>
+<style scoped>
+  input[type='submit'] {
+      background: var(--color-background-mute);
+  }
+</style>

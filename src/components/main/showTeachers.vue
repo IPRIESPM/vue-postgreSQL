@@ -74,6 +74,7 @@
                 type="text"
                 name="dni"
                 id="dni"
+                class="required"
                 placeholder="A12345678"
                 v-model="dataSelected.dni"
                 @change="onChange"
@@ -86,6 +87,7 @@
                 type="text"
                 name="nombre"
                 id="nombre"
+                class="required"
                 @change="onChange"
                 placeholder="Alejandro"
                 v-model="dataSelected.nombre"
@@ -97,6 +99,7 @@
                 type="password"
                 name="contrasena"
                 id="contrasena"
+                class="required"
                 @change="onChange"
                 placeholder="*******"
               >

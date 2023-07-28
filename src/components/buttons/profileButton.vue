@@ -1,8 +1,8 @@
 <template>
   <section>
     <button class="button" @click="changeColorScheme">
-        <font-awesome-icon v-if="savedTheme === 'dark'" :icon="['fas', 'moon']" />
-        <font-awesome-icon v-else :icon="['fas', 'sun']"  />
+        <font-awesome-icon v-if="savedTheme === 'dark'" :icon="['fas', 'sun']" />
+        <font-awesome-icon v-else :icon="['fas', 'moon']"  />
         <div class="slider round"></div>
     </button>
 

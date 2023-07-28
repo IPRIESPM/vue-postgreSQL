@@ -83,6 +83,7 @@
                 id="cif"
                 placeholder="A12345678"
                 v-model="dataSelected.cif"
+                class="required"
                 @change="onChange"
               >
             </fieldset>
@@ -94,6 +95,7 @@
                 id="nombre"
                 placeholder="Empresa S.L."
                 v-model="dataSelected.nombre"
+                class="required"
                 @change="onChange"
               >
             </fieldset>

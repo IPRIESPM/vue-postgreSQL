@@ -31,6 +31,7 @@
                 id="nombre"
                 placeholder="Silvia Amorós"
                 v-model="newContactData.nombre"
+                class="required"
                 autofocus
               />
             </fieldset>
@@ -44,6 +45,7 @@
                 name="correo"
                 id="correo"
                 placeholder="example@example"
+                class="required"
                 v-model="newContactData.correo"
               />
             </fieldset>
@@ -54,6 +56,7 @@
                 type="tel"
                 name="telefono"
                 id="telefono"
+                class="required"
                 placeholder="612345678"
                 v-model="newContactData.telefono"
               />
@@ -94,8 +97,7 @@
         </fieldset>
 
         <section class="button-group">
-          <StandardButton
-            :rounded=true
+          <SubmitButton
             :idleText="editMode ? 'Editar' : 'Añadir'"
             :loading="loading"
             loadingText="Cargando"
@@ -128,6 +130,7 @@
                 id="anyo"
                 required
                 min="2010"
+                class="required"
                 :placeholder="actualYear"
                 v-model="newPositionData.anyo"
               />
@@ -138,6 +141,7 @@
                 type="number"
                 name="vacantes"
                 id="vacantes"
+                class="required"
                 placeholder="15"
                 min="0"
                 v-model="newPositionData.vacantes"
@@ -152,6 +156,7 @@
                 type="text"
                 name="horario"
                 id="horario"
+                class="required"
                 placeholder="9:00 - 14:00"
                 v-model="newPositionData.horario"
               />
@@ -199,7 +204,7 @@
         </section>
       </form>
 
-      <form v-if="modalType === 'anotaciones'" @submit="onSubmit">
+      <form v-if="modalType === 'anotaciones'" @submit.prevent="onSubmitNotes">
         <section class="header">
           <h2>Añadir anotación</h2>
         </section>
@@ -552,6 +557,47 @@ const onSubmitContact = async (event) => {
   }
 };
 
+const onSubmitNotes = async (event) => {
+  event.preventDefault();
+  loading.value = true;
+
+  const response = await newPosition(newPositionData.value);
+  console.log('respuesta del servidor', response);
+
+  const inputNames = [
+    'anyo',
+    'vacantes',
+    'horario'];
+
+  const inputCustomValidity = {
+    anyo: 'El año debe ser mayor a 2010',
+    vacantes: 'El número de vacantes debe ser >= a 0',
+    horario: 'Debes establecer un horario',
+    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newPositionData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al registrar el puesto';
+    error.value = true;
+  }
+};
+
 const editContact = async (contactN) => {
   newContactData.value = {
     ...contacts.value.find((contact) => contact.n === contactN),
@@ -688,7 +734,7 @@ header span {
 
 button.add.contacts{
   position: absolute;
-  transform: translate(239px, -700px);
+  transform: translate(239px, -745px);
 }
 button.add.annotations{
   position: absolute;
@@ -696,7 +742,7 @@ button.add.annotations{
 }
 button.add.position{
   position: absolute;
-  transform: translate(240px, -600px);
+  transform: translate(240px, -640px);
 }
 section.error {
   color: var(--color-error);
