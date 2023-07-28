@@ -476,8 +476,6 @@ const buttonAdd = (type) => {
 const onSubmitPositions = async (event) => {
   event.preventDefault();
   loading.value = true;
-  const response = await newPosition(newPositionData.value);
-  console.log('respuesta del servidor', response);
 
   const inputNames = [
     'anyo',
@@ -500,6 +498,13 @@ const onSubmitPositions = async (event) => {
       input.setCustomValidity('');
     }
   });
+
+  if (!event.target.checkValidity()) {
+    loading.value = false;
+    return;
+  }
+  const response = await newPosition(newPositionData.value);
+  console.log('respuesta del servidor', response);
 
   if (response) {
     buttonAdd('close');
@@ -537,7 +542,10 @@ const onSubmitContact = async (event) => {
       input.setCustomValidity('');
     }
   });
-
+  if (!event.target.checkValidity()) {
+    loading.value = false;
+    return;
+  }
   if (editMode.value) {
     newContactData.value.empresa = profile.value.cif;
     response = await updateContactFromApi(newContactData.value);
