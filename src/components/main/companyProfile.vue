@@ -115,7 +115,8 @@
 
       <form v-if="modalType === 'puestos'" @submit="onSubmitPositions">
         <section class="header">
-          <h2>Añadir nuevos puestos</h2>
+          <h2 v-if="editMode">Editar puesto</h2>
+          <h2 v-else>Añadir nuevos puestos</h2>
         </section>
         <section class="error">
           <p v-if="error">{{ errorMessages }}</p>
@@ -133,6 +134,7 @@
                 class="required"
                 :placeholder="actualYear"
                 v-model="newPositionData.anyo"
+                @change="onChange"
               />
             </fieldset>
             <fieldset>
@@ -144,6 +146,7 @@
                 class="required"
                 placeholder="15"
                 min="0"
+                @change="onChange"
                 v-model="newPositionData.vacantes"
               />
             </fieldset>
@@ -157,6 +160,7 @@
                 name="horario"
                 id="horario"
                 class="required"
+                @change="onChange"
                 placeholder="9:00 - 14:00"
                 v-model="newPositionData.horario"
               />
@@ -182,16 +186,16 @@
             id="descrip"
             cols="30"
             rows="10"
-            v-model="newPositionData.descripcion"
+            v-model="newPositionData.descrip"
             >
           </textarea>
         </fieldset>
 
         <section class="button-group">
           <SubmitButton
-            idleText="Añadir"
-            loadingText="Cargando"
+            :idle-text="editMode ? 'Editar' : 'Añadir'"
             :loading="loading"
+            loadingText="Cargando"
           />
           <button type="button" class="cancel" @click="buttonAdd('close')">
             Cancelar
@@ -352,13 +356,37 @@
           :shadow=false
           @click="buttonAdd('puestos')"/>
       </header>
-      <ul v-if="puestos && puestos.length > 0">
-        <li v-for="puesto in puestos" :key="puesto.cod">
-          <p>{{ puesto.nombre }}</p>
-          <p>{{ puesto.descripcion }}</p>
-          <p>{{ puesto.requisitos }}</p>
-        </li>
-      </ul>
+      <table class="table positions" v-if="puestos && puestos.length > 0">
+        <thead>
+          <tr>
+          <th>Año</th>
+          <th>Horario</th>
+          <th>Ciclo</th>
+          <th>Vacantes</th>
+          <th>Descripción</th>
+          <th class="empty">Opciones</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr v-for="puesto in puestos" :key="puesto.cod">
+            <td >{{ puesto.anyo }}</td>
+            <td>{{ puesto.horario }}</td>
+            <td>{{ puesto.ciclo }}</td>
+            <td>{{ puesto.vacantes }}</td>
+            <td>{{ puesto.descrip }}</td>
+            <td class="icons">
+                <font-awesome-icon
+                  :icon="['fas', 'pen-to-square']"
+                  @click="editPosition(puesto.cod)"
+                />
+                <font-awesome-icon
+                  :icon="['fas', 'trash']"
+                  @click="deletePosition(puesto.cod)"
+                />
+              </td>
+          </tr>
+        </tbody>
+      </table>
       <section class="noData" v-else>
         <header>
           <p>No hay puestos 😢</p>
@@ -381,7 +409,7 @@ import {
   updateContactFromApi,
   deleteContactFromApi,
 } from '../../controllers/api/contacts';
-import newPosition from '../../controllers/api/positions';
+import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
 import LoadingText from '../loading/loadingText.vue';
 
 const router = useRouter();
@@ -405,6 +433,10 @@ const loading = ref(false);
 
 const editMode = ref(false);
 
+const onChange = (event) => {
+  event.target.setCustomValidity('');
+};
+
 const newContactData = ref({
   n: '',
   dni: '',
@@ -422,8 +454,9 @@ const newPositionData = ref({
   vacantes: '',
   horario: '',
   ciclo: 'DAW',
-  descripcion: '',
-  cod: selectedCompany,
+  descrip: ' ',
+  cifEmpresa: selectedCompany,
+  cod: '',
 });
 
 const resetContactFromData = () => {
@@ -447,7 +480,8 @@ const resetContactFromData = () => {
     horario: '',
     ciclo: 'DAW',
     descripción: '',
-    cod: selectedCompany,
+    cifEmpresa: selectedCompany,
+    cod: '',
   };
 };
 
@@ -465,57 +499,13 @@ const buttonAdd = (type) => {
   if (type === 'close') {
     showModal.value = false;
     modalType.value = '';
+    editMode.value = false;
     resetContactFromData();
     return;
   }
   console.log('La empresa es:', profile.value.cif);
   showModal.value = true;
   modalType.value = type;
-};
-
-const onSubmitPositions = async (event) => {
-  event.preventDefault();
-  loading.value = true;
-
-  const inputNames = [
-    'anyo',
-    'vacantes',
-    'horario'];
-
-  const inputCustomValidity = {
-    anyo: 'El año debe ser mayor a 2010',
-    vacantes: 'El número de vacantes debe ser >= a 0',
-    horario: 'Debes establecer un horario',
-    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
-  };
-
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newPositionData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-
-  if (!event.target.checkValidity()) {
-    loading.value = false;
-    return;
-  }
-  const response = await newPosition(newPositionData.value);
-  console.log('respuesta del servidor', response);
-
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al registrar el puesto';
-    error.value = true;
-  }
 };
 
 const onSubmitContact = async (event) => {
@@ -564,7 +554,56 @@ const onSubmitContact = async (event) => {
     errorMessages.value = 'Error al añadir el contacto';
   }
 };
+const onSubmitPositions = async (event) => {
+  event.preventDefault();
+  loading.value = true;
 
+  const inputNames = [
+    'anyo',
+    'vacantes',
+    'horario'];
+
+  const inputCustomValidity = {
+    anyo: 'Debes introducir un año ',
+    vacantes: 'Debes introducir un número de vacantes',
+    horario: 'Debes establecer un horario',
+    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newPositionData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
+  if (!event.target.checkValidity()) {
+    loading.value = false;
+    return;
+  }
+  let response;
+  if (editMode.value) {
+    response = await updatePositionFromApi(newPositionData.value);
+  } else {
+    response = await newPosition(newPositionData.value);
+  }
+
+  console.log('respuesta del servidor', response);
+
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al registrar el puesto';
+    error.value = true;
+  }
+};
 const onSubmitNotes = async (event) => {
   event.preventDefault();
   loading.value = true;
@@ -614,12 +653,34 @@ const editContact = async (contactN) => {
   buttonAdd('contactos');
 };
 
+const editPosition = async (positionCod) => {
+  console.log('editando', positionCod);
+  newPositionData.value = {
+    ...puestos.value.find((position) => position.cod === positionCod),
+  };
+  newPositionData.value.cif_company = profile.value.cif;
+  newPositionData.value.cod = positionCod;
+
+  console.log('editando', newPositionData.value);
+  editMode.value = true;
+  buttonAdd('puestos');
+};
+
 const deleteContact = async (contactN) => {
   const response = await deleteContactFromApi(contactN);
   if (response) {
     await getCompanyProfile();
   } else {
     errorMessages.value = 'Error al eliminar el contacto';
+  }
+};
+
+const deletePosition = async (positionCod) => {
+  const response = await deletePositionFromApi(positionCod);
+  if (response) {
+    await getCompanyProfile();
+  } else {
+    errorMessages.value = 'Error al eliminar el puesto';
   }
 };
 
@@ -757,5 +818,8 @@ section.error {
   text-align: center;
   margin-bottom: 1rem;
   height: 30px;
+}
+table.table.positions{
+  text-align: center;
 }
 </style>
