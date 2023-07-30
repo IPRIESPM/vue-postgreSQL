@@ -1,3 +1,317 @@
+<script setup>
+import { ref, onMounted, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+import companyStore from '../../store/perfilEmpresa';
+import companyProfile from '../../controllers/api/companyProfile';
+import StandardButton from '../buttons/standardButton.vue';
+import RoundedButton from '../buttons/roundedButton.vue';
+import SubmitButton from '../buttons/submitButton.vue';
+import {
+  newContact,
+  updateContactFromApi,
+  deleteContactFromApi,
+} from '../../controllers/api/contacts';
+import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
+import LoadingText from '../loading/loadingText.vue';
+
+const router = useRouter();
+const companyStored = companyStore();
+
+const selectedCompany = ref('');
+const rawData = ref('');
+const profile = ref('');
+const contacts = ref('');
+const puestos = ref('');
+
+const errorMessages = ref('');
+const error = ref(false);
+
+const actualYear = new Date().getFullYear();
+const fechaActual = ref(new Date().toISOString().split('T')[0]);
+
+const showModal = ref(false);
+const modalType = ref('');
+const loading = ref(false);
+
+const editMode = ref(false);
+
+const onChange = (event) => {
+  event.target.setCustomValidity('');
+};
+
+const newContactData = ref({
+  n: '',
+  dni: '',
+  nombre: '',
+  correo: '',
+  telefono: '',
+  tipo: 'RRHH',
+  principal: false,
+  funciones: '',
+  empresa: profile.value.cif,
+});
+
+const newPositionData = ref({
+  anyo: actualYear,
+  vacantes: '',
+  horario: '',
+  ciclo: 'DAW',
+  descrip: ' ',
+  cifEmpresa: selectedCompany,
+  cod: '',
+});
+
+const newAnnotationData = ref({
+  codigo: actualYear,
+  contacto: '',
+  profesor_dni: '',
+  anyo: actualYear,
+  tipo: 'telefono',
+  confirmado: '',
+  anotacion: '',
+});
+
+const resetContactFromData = () => {
+  error.value = false;
+  errorMessages.value = '';
+  newContactData.value = {
+    n: '',
+    dni: '',
+    nombre: '',
+    correo: '',
+    telefono: '',
+    tipo: 'RRHH',
+    principal: false,
+    funciones: '',
+    empresa: profile.value.cif,
+  };
+
+  newPosition.value = {
+    anyo: actualYear,
+    vacantes: '',
+    horario: '',
+    ciclo: 'DAW',
+    descripción: '',
+    cifEmpresa: selectedCompany,
+    cod: '',
+  };
+};
+
+const getCompanyProfile = async () => {
+  console.log('Actualizando datos');
+  const profileApi = await companyProfile(companyStored.getEmpresaSelected);
+  rawData.value = profileApi;
+  profile.value = profileApi.empresa;
+  contacts.value = profileApi.contactos;
+  puestos.value = profileApi.puestos;
+  newContactData.value.empresa = profile.value.cif;
+};
+
+const buttonAdd = (type) => {
+  if (type === 'close') {
+    showModal.value = false;
+    modalType.value = '';
+    editMode.value = false;
+    resetContactFromData();
+    return;
+  }
+  console.log('La empresa es:', profile.value.cif);
+  showModal.value = true;
+  modalType.value = type;
+};
+
+const onSubmitContact = async (event) => {
+  event.preventDefault();
+  loading.value = true;
+
+  let response;
+  const inputNames = [
+    'nombre',
+    'correo',
+    'telefono'];
+  const inputCustomValidity = {
+    nombre: 'Debes introducir un nombre',
+    correo: 'Debes introducir un correo',
+    telefono: 'Debes introducir un teléfono',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newContactData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+  if (!event.target.checkValidity()) {
+    loading.value = false;
+    return;
+  }
+  if (editMode.value) {
+    newContactData.value.empresa = profile.value.cif;
+    response = await updateContactFromApi(newContactData.value);
+  } else {
+    response = await newContact(newContactData.value);
+  }
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+
+    editMode.value = false;
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al añadir el contacto';
+  }
+};
+
+const onSubmitPositions = async (event) => {
+  event.preventDefault();
+  loading.value = true;
+
+  const inputNames = [
+    'anyo',
+    'vacantes',
+    'horario'];
+
+  const inputCustomValidity = {
+    anyo: 'Debes introducir un año ',
+    vacantes: 'Debes introducir un número de vacantes',
+    horario: 'Debes establecer un horario',
+    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newPositionData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
+  if (!event.target.checkValidity()) {
+    loading.value = false;
+    return;
+  }
+  let response;
+  if (editMode.value) {
+    response = await updatePositionFromApi(newPositionData.value);
+  } else {
+    response = await newPosition(newPositionData.value);
+  }
+
+  console.log('respuesta del servidor', response);
+
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al registrar el puesto';
+    error.value = true;
+  }
+};
+
+const onSubmitNotes = async (event) => {
+  event.preventDefault();
+  loading.value = true;
+
+  const response = await newPosition(newPositionData.value);
+  console.log('respuesta del servidor', response);
+
+  const inputNames = [
+    'anyo',
+    'fecha'];
+
+  const inputCustomValidity = {
+    anyo: 'El año debe ser mayor a 2010',
+    fecha: 'Debes introducir una fecha',
+  };
+
+  inputNames.forEach((inputName) => {
+    const input = event.target.querySelector(`input[name="${inputName}"]`);
+    const inputValue = newPositionData.value[inputName];
+    if (inputValue === '') {
+      input.setCustomValidity(inputCustomValidity[inputName]);
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+
+  if (response) {
+    buttonAdd('close');
+    loading.value = false;
+    resetContactFromData();
+    await getCompanyProfile();
+  } else {
+    loading.value = false;
+    errorMessages.value = 'Error al registrar la anotación';
+    error.value = true;
+  }
+};
+
+const editContact = async (contactN) => {
+  newContactData.value = {
+    ...contacts.value.find((contact) => contact.n === contactN),
+  };
+  editMode.value = true;
+  buttonAdd('contactos');
+};
+
+const editPosition = async (positionCod) => {
+  console.log('editando', positionCod);
+  newPositionData.value = {
+    ...puestos.value.find((position) => position.cod === positionCod),
+  };
+  newPositionData.value.cif_company = profile.value.cif;
+  newPositionData.value.cod = positionCod;
+
+  console.log('editando', newPositionData.value);
+  editMode.value = true;
+  buttonAdd('puestos');
+};
+
+const deleteContact = async (contactN) => {
+  const response = await deleteContactFromApi(contactN);
+  if (response) {
+    await getCompanyProfile();
+  } else {
+    errorMessages.value = 'Error al eliminar el contacto';
+  }
+};
+
+const deletePosition = async (positionCod) => {
+  const response = await deletePositionFromApi(positionCod);
+  if (response) {
+    await getCompanyProfile();
+  } else {
+    errorMessages.value = 'Error al eliminar el puesto';
+  }
+};
+
+onBeforeMount(() => {
+  if (companyStored.getEmpresaSelected === '') {
+    router.push({ name: 'empresas' });
+  }
+});
+
+onMounted(async () => {
+  if (companyStored.getEmpresaSelected !== '') {
+    loading.value = true;
+    selectedCompany.value = companyStored.getEmpresaSelected;
+    await getCompanyProfile();
+    loading.value = false;
+  }
+});
+
+</script>
+
 <template>
   <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }">
     <section class="modal-main">
@@ -180,12 +494,13 @@
         </section>
 
         <fieldset>
-          <label for="descrip">Descripción</label>
+          <label for="descrip">Descripción <small>200 max</small></label>
           <textarea
             name="descrip"
             id="descrip"
             cols="30"
             rows="10"
+            maxlength="200"
             v-model="newPositionData.descrip"
             >
           </textarea>
@@ -215,7 +530,7 @@
         <section class="main">
           <section class="fieldset-group">
             <fieldset>
-              <label for="anyo">Año {{ newPositionData.anyo }}</label>
+              <label for="anyo">Año {{ newAnnotationData.anyo }}</label>
               <input
                 type="number"
                 name="anyo"
@@ -223,7 +538,7 @@
                 required
                 min="2010"
                 :placeholder="actualYear"
-                v-model="newPositionData.anyo"
+                v-model="newAnnotationData.anyo"
               />
             </fieldset>
             <fieldset>
@@ -240,14 +555,23 @@
 
           <section class="fieldset-group">
             <fieldset>
-              <label for="ciclo">Tipo</label>
-              <select name="ciclo" id="ciclo">
-                <option value="FPB">Telefono</option>
-                <option value="SMR">Correo</option>
-                <option value="DAM">Persona</option>
+              <label for="tipo">Tipo</label>
+              <select name="tipo" id="tipo" v-model="newAnnotationData.tipo">
+                <option value="telefono">Telefono</option>
+                <option value="correo">Correo</option>
+                <option value="persona">Persona</option>
               </select>
             </fieldset>
 
+            <fieldset class="checkbox">
+            <label for="confirmado">Confirmado</label>
+            <input
+              type="checkbox"
+              name="confirmado"
+              id="confirmado"
+              v-model="newPositionData.co"
+            />
+          </fieldset>
           </section>
         </section>
 
@@ -396,310 +720,6 @@
   </section>
   <LoadingText v-else />
 </template>
-<script setup>
-import { ref, onMounted, onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
-import companyStore from '../../store/perfilEmpresa';
-import companyProfile from '../../controllers/api/companyProfile';
-import StandardButton from '../buttons/standardButton.vue';
-import RoundedButton from '../buttons/roundedButton.vue';
-import SubmitButton from '../buttons/submitButton.vue';
-import {
-  newContact,
-  updateContactFromApi,
-  deleteContactFromApi,
-} from '../../controllers/api/contacts';
-import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
-import LoadingText from '../loading/loadingText.vue';
-
-const router = useRouter();
-const companyStored = companyStore();
-
-const selectedCompany = ref('');
-const rawData = ref('');
-const profile = ref('');
-const contacts = ref('');
-const puestos = ref('');
-
-const errorMessages = ref('');
-const error = ref(false);
-
-const actualYear = new Date().getFullYear();
-const fechaActual = ref(new Date().toISOString().split('T')[0]);
-
-const showModal = ref(false);
-const modalType = ref('');
-const loading = ref(false);
-
-const editMode = ref(false);
-
-const onChange = (event) => {
-  event.target.setCustomValidity('');
-};
-
-const newContactData = ref({
-  n: '',
-  dni: '',
-  nombre: '',
-  correo: '',
-  telefono: '',
-  tipo: 'RRHH',
-  principal: false,
-  funciones: '',
-  empresa: profile.value.cif,
-});
-
-const newPositionData = ref({
-  anyo: actualYear,
-  vacantes: '',
-  horario: '',
-  ciclo: 'DAW',
-  descrip: ' ',
-  cifEmpresa: selectedCompany,
-  cod: '',
-});
-
-const resetContactFromData = () => {
-  error.value = false;
-  errorMessages.value = '';
-  newContactData.value = {
-    n: '',
-    dni: '',
-    nombre: '',
-    correo: '',
-    telefono: '',
-    tipo: 'RRHH',
-    principal: false,
-    funciones: '',
-    empresa: profile.value.cif,
-  };
-
-  newPosition.value = {
-    anyo: actualYear,
-    vacantes: '',
-    horario: '',
-    ciclo: 'DAW',
-    descripción: '',
-    cifEmpresa: selectedCompany,
-    cod: '',
-  };
-};
-
-const getCompanyProfile = async () => {
-  console.log('Actualizando datos');
-  const profileApi = await companyProfile(companyStored.getEmpresaSelected);
-  rawData.value = profileApi;
-  profile.value = profileApi.empresa;
-  contacts.value = profileApi.contactos;
-  puestos.value = profileApi.puestos;
-  newContactData.value.empresa = profile.value.cif;
-};
-
-const buttonAdd = (type) => {
-  if (type === 'close') {
-    showModal.value = false;
-    modalType.value = '';
-    editMode.value = false;
-    resetContactFromData();
-    return;
-  }
-  console.log('La empresa es:', profile.value.cif);
-  showModal.value = true;
-  modalType.value = type;
-};
-
-const onSubmitContact = async (event) => {
-  event.preventDefault();
-  loading.value = true;
-
-  let response;
-  const inputNames = [
-    'nombre',
-    'correo',
-    'telefono'];
-  const inputCustomValidity = {
-    nombre: 'Debes introducir un nombre',
-    correo: 'Debes introducir un correo',
-    telefono: 'Debes introducir un teléfono',
-  };
-
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newContactData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-  if (!event.target.checkValidity()) {
-    loading.value = false;
-    return;
-  }
-  if (editMode.value) {
-    newContactData.value.empresa = profile.value.cif;
-    response = await updateContactFromApi(newContactData.value);
-  } else {
-    response = await newContact(newContactData.value);
-  }
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
-
-    editMode.value = false;
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al añadir el contacto';
-  }
-};
-const onSubmitPositions = async (event) => {
-  event.preventDefault();
-  loading.value = true;
-
-  const inputNames = [
-    'anyo',
-    'vacantes',
-    'horario'];
-
-  const inputCustomValidity = {
-    anyo: 'Debes introducir un año ',
-    vacantes: 'Debes introducir un número de vacantes',
-    horario: 'Debes establecer un horario',
-    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
-  };
-
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newPositionData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-
-  if (!event.target.checkValidity()) {
-    loading.value = false;
-    return;
-  }
-  let response;
-  if (editMode.value) {
-    response = await updatePositionFromApi(newPositionData.value);
-  } else {
-    response = await newPosition(newPositionData.value);
-  }
-
-  console.log('respuesta del servidor', response);
-
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al registrar el puesto';
-    error.value = true;
-  }
-};
-const onSubmitNotes = async (event) => {
-  event.preventDefault();
-  loading.value = true;
-
-  const response = await newPosition(newPositionData.value);
-  console.log('respuesta del servidor', response);
-
-  const inputNames = [
-    'anyo',
-    'vacantes',
-    'horario'];
-
-  const inputCustomValidity = {
-    anyo: 'El año debe ser mayor a 2010',
-    vacantes: 'El número de vacantes debe ser >= a 0',
-    horario: 'Debes establecer un horario',
-    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
-  };
-
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newPositionData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al registrar el puesto';
-    error.value = true;
-  }
-};
-
-const editContact = async (contactN) => {
-  newContactData.value = {
-    ...contacts.value.find((contact) => contact.n === contactN),
-  };
-  editMode.value = true;
-  buttonAdd('contactos');
-};
-
-const editPosition = async (positionCod) => {
-  console.log('editando', positionCod);
-  newPositionData.value = {
-    ...puestos.value.find((position) => position.cod === positionCod),
-  };
-  newPositionData.value.cif_company = profile.value.cif;
-  newPositionData.value.cod = positionCod;
-
-  console.log('editando', newPositionData.value);
-  editMode.value = true;
-  buttonAdd('puestos');
-};
-
-const deleteContact = async (contactN) => {
-  const response = await deleteContactFromApi(contactN);
-  if (response) {
-    await getCompanyProfile();
-  } else {
-    errorMessages.value = 'Error al eliminar el contacto';
-  }
-};
-
-const deletePosition = async (positionCod) => {
-  const response = await deletePositionFromApi(positionCod);
-  if (response) {
-    await getCompanyProfile();
-  } else {
-    errorMessages.value = 'Error al eliminar el puesto';
-  }
-};
-
-onBeforeMount(() => {
-  if (companyStored.getEmpresaSelected === '') {
-    router.push({ name: 'empresas' });
-  }
-});
-
-onMounted(async () => {
-  if (companyStored.getEmpresaSelected !== '') {
-    loading.value = true;
-    selectedCompany.value = companyStored.getEmpresaSelected;
-    await getCompanyProfile();
-    loading.value = false;
-  }
-});
-
-</script>
 
 <style scoped>
 section.loading {
@@ -803,15 +823,15 @@ header span {
 
 button.add.contacts{
   position: absolute;
-  transform: translate(239px, -745px);
+  transform: translate(241px, -795px);
 }
 button.add.annotations{
   position: absolute;
-  transform: translate(400px, -650px);
+  transform: translate(400px, -700px);
 }
 button.add.position{
   position: absolute;
-  transform: translate(240px, -640px);
+  transform: translate(240px, -690px);
 }
 section.error {
   color: var(--color-error);

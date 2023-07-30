@@ -47,6 +47,11 @@ p{
     padding: 0;
 }
 
+small{
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
 div.loading{
     height: 30px;
     width: 30px;
@@ -60,7 +65,7 @@ div.loading{
 
 .error-message{
     color: var(--color-error);
-    
+
     transition: all 1s;
     text-align: center;
     opacity: 0;
