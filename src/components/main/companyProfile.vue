@@ -1,11 +1,14 @@
 <script setup>
-import { ref, onMounted, onBeforeMount } from 'vue';
+import {
+  ref, onMounted, onBeforeMount,
+  watch,
+} from 'vue';
 import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
 import companyProfile from '../../controllers/api/companyProfile';
-import StandardButton from '../buttons/standardButton.vue';
 import RoundedButton from '../buttons/roundedButton.vue';
 import SubmitButton from '../buttons/submitButton.vue';
+import AnnotationsFrom from '../companyProfile/AnnotationsFrom.vue';
 import {
   newContact,
   updateContactFromApi,
@@ -13,9 +16,11 @@ import {
 } from '../../controllers/api/contacts';
 import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
 import LoadingText from '../loading/loadingText.vue';
+import modalStore from '../../store/modal';
 
 const router = useRouter();
 const companyStored = companyStore();
+const modalStored = modalStore();
 
 const selectedCompany = ref('');
 const rawData = ref('');
@@ -27,16 +32,30 @@ const errorMessages = ref('');
 const error = ref(false);
 
 const actualYear = new Date().getFullYear();
-const fechaActual = ref(new Date().toISOString().split('T')[0]);
 
-const showModal = ref(false);
-const modalType = ref('');
+const showModal = ref(modalStored.getShowModal);
+const modalType = ref(modalStored.getModalType);
+
+const selectedContact = ref({});
+
 const loading = ref(false);
 
 const editMode = ref(false);
 
 const onChange = (event) => {
   event.target.setCustomValidity('');
+};
+
+const getClass = (contactN) => {
+  if (selectedContact.value.n === contactN) {
+    return 'selected';
+  }
+  return '';
+};
+
+const selectContact = (n) => {
+  console.log('seleccionando', n);
+  companyStored.setSelectedContact(n);
 };
 
 const newContactData = ref({
@@ -59,16 +78,6 @@ const newPositionData = ref({
   descrip: ' ',
   cifEmpresa: selectedCompany,
   cod: '',
-});
-
-const newAnnotationData = ref({
-  codigo: actualYear,
-  contacto: '',
-  profesor_dni: '',
-  anyo: actualYear,
-  tipo: 'telefono',
-  confirmado: '',
-  anotacion: '',
 });
 
 const resetContactFromData = () => {
@@ -99,7 +108,9 @@ const resetContactFromData = () => {
 
 const getCompanyProfile = async () => {
   console.log('Actualizando datos');
+  loading.value = true;
   const profileApi = await companyProfile(companyStored.getEmpresaSelected);
+  loading.value = false;
   rawData.value = profileApi;
   profile.value = profileApi.empresa;
   contacts.value = profileApi.contactos;
@@ -109,14 +120,15 @@ const getCompanyProfile = async () => {
 
 const buttonAdd = (type) => {
   if (type === 'close') {
-    showModal.value = false;
+    modalStored.setShowModal(false);
     modalType.value = '';
     editMode.value = false;
     resetContactFromData();
     return;
   }
   console.log('La empresa es:', profile.value.cif);
-  showModal.value = true;
+  modalStored.setShowModal(true);
+  showModal.value = modalStored.getShowModal;
   modalType.value = type;
 };
 
@@ -218,44 +230,6 @@ const onSubmitPositions = async (event) => {
   }
 };
 
-const onSubmitNotes = async (event) => {
-  event.preventDefault();
-  loading.value = true;
-
-  const response = await newPosition(newPositionData.value);
-  console.log('respuesta del servidor', response);
-
-  const inputNames = [
-    'anyo',
-    'fecha'];
-
-  const inputCustomValidity = {
-    anyo: 'El año debe ser mayor a 2010',
-    fecha: 'Debes introducir una fecha',
-  };
-
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newPositionData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al registrar la anotación';
-    error.value = true;
-  }
-};
-
 const editContact = async (contactN) => {
   newContactData.value = {
     ...contacts.value.find((contact) => contact.n === contactN),
@@ -304,16 +278,32 @@ onBeforeMount(() => {
 onMounted(async () => {
   if (companyStored.getEmpresaSelected !== '') {
     loading.value = true;
-    selectedCompany.value = companyStored.getEmpresaSelected;
+    selectedCompany.value = await companyProfile(companyStored.getEmpresaSelected);
+    companyStored.updateEmpresa(selectedCompany.value);
     await getCompanyProfile();
+    companyStored.setSelectedContact(companyStored.getPrincipalContact.n);
     loading.value = false;
   }
+});
+
+watch(() => companyStored.selectedContact, (value) => {
+  selectedContact.value = value;
+  // getAnnotationsFromApi();
+});
+
+watch(() => modalStored.getShowModal, (value) => {
+  showModal.value = value;
+});
+
+watch(() => modalStored.getModalType, (value) => {
+  modalType.value = value;
 });
 
 </script>
 
 <template>
-  <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }">
+  <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }" :key="showModal">
+
     <section class="modal-main">
 
       <form v-if="modalType === 'contactos'" @submit="onSubmitContact">
@@ -523,76 +513,7 @@ onMounted(async () => {
         </section>
       </form>
 
-      <form v-if="modalType === 'anotaciones'" @submit.prevent="onSubmitNotes">
-        <section class="header">
-          <h2>Añadir anotación</h2>
-        </section>
-        <section class="main">
-          <section class="fieldset-group">
-            <fieldset>
-              <label for="anyo">Año {{ newAnnotationData.anyo }}</label>
-              <input
-                type="number"
-                name="anyo"
-                id="anyo"
-                required
-                min="2010"
-                :placeholder="actualYear"
-                v-model="newAnnotationData.anyo"
-              />
-            </fieldset>
-            <fieldset>
-              <label for="fecha">Fecha</label>
-              <input
-                type="date"
-                name="fecha"
-                id="fecha_actual"
-                :value="fechaActual"
-                required
-              />
-            </fieldset>
-          </section>
-
-          <section class="fieldset-group">
-            <fieldset>
-              <label for="tipo">Tipo</label>
-              <select name="tipo" id="tipo" v-model="newAnnotationData.tipo">
-                <option value="telefono">Telefono</option>
-                <option value="correo">Correo</option>
-                <option value="persona">Persona</option>
-              </select>
-            </fieldset>
-
-            <fieldset class="checkbox">
-            <label for="confirmado">Confirmado</label>
-            <input
-              type="checkbox"
-              name="confirmado"
-              id="confirmado"
-              v-model="newPositionData.co"
-            />
-          </fieldset>
-          </section>
-        </section>
-
-        <fieldset>
-          <label for="descrip">Anotación</label>
-          <textarea name="descrip" id="descrip" cols="30" rows="10"></textarea>
-        </fieldset>
-
-        <section class="button-group">
-          <StandardButton idleText="añadir" />
-          <button type="button" class="cancel" @click="buttonAdd('close')">
-            Cancelar
-          </button>
-        </section>
-        <RoundedButton
-            :modal=showModal
-            :class="{ 'modal': showModal }"
-            class="annotations"
-            @click="buttonAdd('close')"
-          />
-      </form>
+      <AnnotationsFrom v-if="modalType === 'anotaciones'"/>
 
     </section>
   </section>
@@ -631,11 +552,11 @@ onMounted(async () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="contact in contacts" :key="contact.n">
-              <td>{{ contact.nombre }}</td>
-              <td>{{ contact.telefono }}</td>
-              <td>{{ contact.correo }}</td>
-              <td class="icons">
+            <tr v-for="contact in contacts" :key="contact.n" @click="selectContact(contact.n)">
+              <td :class="getClass(contact.n)">{{ contact.nombre }}</td>
+              <td :class="getClass(contact.n)">{{ contact.telefono }}</td>
+              <td :class="getClass(contact.n)">{{ contact.correo }}</td>
+              <td :class="getClass(contact.n)" class="icons">
                 <font-awesome-icon
                   :icon="['fas', 'pen-to-square']"
                   @click="editContact(contact.n)"
@@ -821,10 +742,6 @@ header span {
   gap: 0.5em;
 }
 
-button.add.contacts{
-  position: absolute;
-  transform: translate(241px, -795px);
-}
 button.add.annotations{
   position: absolute;
   transform: translate(400px, -700px);
@@ -841,5 +758,8 @@ section.error {
 }
 table.table.positions{
   text-align: center;
+}
+td.selected{
+  background:var(--color-background-soft);;
 }
 </style>

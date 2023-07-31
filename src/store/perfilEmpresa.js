@@ -3,7 +3,6 @@ import { ref } from 'vue';
 
 export default defineStore('empresa', {
   state: () => ({
-    selected: ref(''),
     cif: ref(''),
     nombre: ref(''),
     direccion: ref(''),
@@ -14,24 +13,19 @@ export default defineStore('empresa', {
     contactos: ref([]),
     puestos: ref([]),
     anotaciones: ref([]),
+    empresaSeleccionada: ref({}),
+    selectedContact: ref({}),
   }),
   getters: {
     getEmpresa: (state) => state,
-    getEmpresaSelected: (state) => state.selected,
+    getEmpresaSelected: (state) => state.cif,
+    getPrincipalContact: (state) => state.contactos.find((contacto) => contacto.principal === true),
+
   },
   actions: {
-    selectEmpresa(cif) {
-      this.selected = cif;
-    },
-    setEmpresa(data) {
-      this.listado = data.data;
-      this.version = data.version;
-      this.date = new Date();
-    },
-    addEmpresa(empresa) {
-      this.listado.push(empresa);
-    },
-    updateEmpresa(empresa) {
+    updateEmpresa(objeto) {
+      console.log(objeto);
+      const { empresa, contactos, puestos } = objeto;
       this.cif = empresa.cif;
       this.nombre = empresa.nombre;
       this.direccion = empresa.direccion;
@@ -39,8 +33,8 @@ export default defineStore('empresa', {
       this.comunidad = empresa.comunidad;
       this.telefono = empresa.telefono;
       this.profesor = empresa.profesor;
-      this.contactos = empresa.contactos;
-      this.puestos = empresa.puestos;
+      this.contactos = contactos;
+      this.puestos = puestos;
       this.anotaciones = empresa.anotaciones;
     },
     deleteEmpresa() {
@@ -54,6 +48,12 @@ export default defineStore('empresa', {
       this.contactos = [];
       this.puestos = [];
       this.anotaciones = [];
+    },
+    selectEmpresa(cif) {
+      this.cif = cif;
+    },
+    setSelectedContact(n) {
+      this.selectedContact = this.contactos.find((contacto) => contacto.n === n);
     },
   },
   persist: {
