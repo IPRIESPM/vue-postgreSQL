@@ -23,9 +23,15 @@ export default defineStore('empresa', {
 
   },
   actions: {
+    setAnnotations(annotations) {
+      console.log(annotations);
+      this.anotaciones = annotations;
+    },
     updateEmpresa(objeto) {
       console.log(objeto);
-      const { empresa, contactos, puestos } = objeto;
+      const {
+        empresa, contactos, puestos,
+      } = objeto;
       this.cif = empresa.cif;
       this.nombre = empresa.nombre;
       this.direccion = empresa.direccion;
@@ -35,7 +41,6 @@ export default defineStore('empresa', {
       this.profesor = empresa.profesor;
       this.contactos = contactos;
       this.puestos = puestos;
-      this.anotaciones = empresa.anotaciones;
     },
     deleteEmpresa() {
       this.cif = '';

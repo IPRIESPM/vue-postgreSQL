@@ -7,6 +7,7 @@ import SubmitButton from '../buttons/submitButton.vue';
 import companyStore from '../../store/perfilEmpresa';
 import modalStore from '../../store/modal';
 import userStore from '../../store/user';
+import { newAnnotation } from '../../controllers/api/annotations';
 
 const companyStored = companyStore();
 const modalStored = modalStore();
@@ -14,6 +15,8 @@ const userStored = userStore();
 
 const loading = ref(false);
 const contactSelected = ref('');
+
+const editMode = ref(false);
 // eslint-disable-next-line no-unused-vars
 const contacts = ref(companyStored.getContactos);
 const error = ref(false);
@@ -25,19 +28,53 @@ const actualYear = ref(new Date().getFullYear());
 const selectedAnnotationData = ref({
   anyo: actualYear.value,
   fecha: actualDay.value,
-  tipo: '',
-  descrip: '',
+  tipo: 'Teléfono',
+  anotacion: '',
+  confirmado: false,
   contactoN: contactSelected.value,
-  profesorDni: userStored.getUser,
+  profesorDni: userStored.getUser.dni,
 });
-
+const resetFromData = () => {
+  selectedAnnotationData.value = {
+    anyo: actualYear.value,
+    fecha: actualDay.value,
+    tipo: 'Teléfono',
+    anotacion: '',
+    confirmado: false,
+    contactoN: contactSelected.value,
+    profesorDni: userStored.getUser,
+  };
+};
 const buttonModal = () => {
   modalStored.setShowModal(false);
+};
+const onSubmit = async (event) => {
+  event.preventDefault();
+  console.log('Enviando anotacion...');
+  loading.value = true;
+  selectedAnnotationData.value.contactoN = contactSelected.value;
+  let response;
+  if (editMode.value) {
+    // response = await updateContactFromApi(newContactData.value);
+  } else {
+    console.log(selectedAnnotationData.value);
+    response = await newAnnotation(selectedAnnotationData.value);
+  }
+
+  if (response) {
+    loading.value = false;
+    resetFromData();
+    editMode.value = false;
+  } else {
+    loading.value = false;
+    error.value = true;
+    errorMessages.value = 'Error al añadir la anotacion';
+  }
 };
 
 onMounted(() => {
   loading.value = false;
-  contactSelected.value = companyStored.getContactoSeleccionado;
+  contactSelected.value = companyStored.selectedContact.contacto_n;
 });
 
 onBeforeMount(() => {
@@ -52,7 +89,8 @@ watch(
 );
 </script>
 <template>
-  <form @submit.prevent="onSubmitNotes">
+
+  <form @submit.prevent="onSubmit">
     <section class="header">
       <h2>Añadir anotación</h2>
     </section>
@@ -99,12 +137,12 @@ watch(
             </select>
           </fieldset>
           <fieldset class="checkbox">
-            <label for="verificado">Verificado</label>
+            <label for="confirmado">Confirmado</label>
             <input
               type="checkbox"
-              name="verificado"
-              id="verificado"
-              v-model="selectedAnnotationData.verificado"
+              name="confirmado"
+              id="confirmado"
+              v-model="selectedAnnotationData.confirmado"
             />
           </fieldset>
       </section>
@@ -121,8 +159,8 @@ watch(
     </section>
 
     <RoundedButton
-      :modal="true"
-      :class="{ modal: true }"
+      :modal=true
+      color="primary"
       class="contacts"
       @click="buttonModal"
     />
@@ -132,7 +170,7 @@ watch(
             :loading="loading"
             loadingText="Cargando"
           />
-          <button type="button" class="cancel" @click="buttonModal">
+          <button type="button" class="cancel"  @click="buttonModal">
             Cancelar
           </button>
         </section>
@@ -140,8 +178,38 @@ watch(
 </template>
 <style scoped>
 button.add {
-
   position: absolute;
-  transform: translate(326px, -765px);
+  transform: translate(405px, -580px);
+}
+section.fieldset-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+fieldset.checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 50px;
+  padding-left: 90px;
+}
+section.button-group {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+}
+button.cancel {
+  background-color: var(--button-background-hover);
+  color: var(--color-text);
+  border: 1px solid var(--button-background);
+
+  border-radius: 2px;
+  height: 48px;
 }
 </style>

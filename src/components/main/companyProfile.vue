@@ -15,6 +15,7 @@ import {
   deleteContactFromApi,
 } from '../../controllers/api/contacts';
 import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
+import { getContactAnnotationFromApi } from '../../controllers/api/annotations';
 import LoadingText from '../loading/loadingText.vue';
 import modalStore from '../../store/modal';
 
@@ -27,6 +28,7 @@ const rawData = ref('');
 const profile = ref('');
 const contacts = ref('');
 const puestos = ref('');
+const annotations = ref('');
 
 const errorMessages = ref('');
 const error = ref(false);
@@ -286,9 +288,12 @@ onMounted(async () => {
   }
 });
 
-watch(() => companyStored.selectedContact, (value) => {
+watch(() => companyStored.selectedContact, async (value) => {
+  console.log('cambiando', value);
   selectedContact.value = value;
-  // getAnnotationsFromApi();
+  annotations.value = await getContactAnnotationFromApi(value.contacto_n);
+  console.log('anotaciones', annotations.value);
+  companyStored.setAnnotations(annotations.value);
 });
 
 watch(() => modalStored.getShowModal, (value) => {
@@ -580,13 +585,12 @@ watch(() => modalStored.getModalType, (value) => {
           />
         </header>
           <section
-            v-if="profile.anotaciones"
+            v-if="annotations && annotations.length > 0"
             class="anotaciones-data"
           >
-            <p>{{ profile.anotaciones }}</p>
+            <p>{{ annotations }}</p>
           </section>
           <section v-else class="noData">No hay anotaciones 😢</section>
-          <p>{{ profile.anotaciones }}</p>
         </section>
       </section>
       <section class="noData" v-else>
@@ -749,6 +753,10 @@ button.add.annotations{
 button.add.position{
   position: absolute;
   transform: translate(240px, -690px);
+}
+button.add.contacts{
+  position: absolute;
+  transform: translate(240px, -800px);
 }
 section.error {
   color: var(--color-error);
