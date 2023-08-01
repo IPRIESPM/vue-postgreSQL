@@ -62,8 +62,10 @@ const onSubmit = async (event) => {
   }
 
   if (response) {
+    companyStored.setAnnotations(selectedAnnotationData.value);
     loading.value = false;
     resetFromData();
+    buttonModal();
     editMode.value = false;
   } else {
     loading.value = false;

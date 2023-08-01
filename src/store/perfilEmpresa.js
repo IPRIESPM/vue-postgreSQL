@@ -20,6 +20,7 @@ export default defineStore('empresa', {
     getEmpresa: (state) => state,
     getEmpresaSelected: (state) => state.cif,
     getPrincipalContact: (state) => state.contactos.find((contacto) => contacto.principal === true),
+    getAnnotations: (state) => state.anotaciones,
 
   },
   actions: {

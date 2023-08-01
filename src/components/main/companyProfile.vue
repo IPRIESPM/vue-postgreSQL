@@ -15,7 +15,7 @@ import {
   deleteContactFromApi,
 } from '../../controllers/api/contacts';
 import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
-import { getContactAnnotationFromApi } from '../../controllers/api/annotations';
+import { getContactAnnotationFromApi, deleteAnnotationFromApi } from '../../controllers/api/annotations';
 import LoadingText from '../loading/loadingText.vue';
 import modalStore from '../../store/modal';
 
@@ -271,6 +271,23 @@ const deletePosition = async (positionCod) => {
   }
 };
 
+const updateAnnotations = async () => {
+  loading.value = true;
+  annotations.value = await getContactAnnotationFromApi(selectedContact.value.n);
+  loading.value = false;
+};
+
+const deleteAnnotation = async (annotationCod) => {
+  loading.value = true;
+  const response = await deleteAnnotationFromApi(annotationCod);
+
+  if (!response) {
+    console.log('Error al eliminar la anotación');
+  }
+  updateAnnotations();
+  loading.value = false;
+};
+
 onBeforeMount(() => {
   if (companyStored.getEmpresaSelected === '') {
     router.push({ name: 'empresas' });
@@ -291,9 +308,14 @@ onMounted(async () => {
 watch(() => companyStored.selectedContact, async (value) => {
   console.log('cambiando', value);
   selectedContact.value = value;
-  annotations.value = await getContactAnnotationFromApi(value.contacto_n);
+  annotations.value = await getContactAnnotationFromApi(value.n);
   console.log('anotaciones', annotations.value);
-  companyStored.setAnnotations(annotations.value);
+});
+
+watch(() => companyStored.getAnnotations, async (value) => {
+  console.log('cambiando', value);
+  annotations.value = await getContactAnnotationFromApi(value.contactoN);
+  console.log('anotaciones', annotations.value);
 });
 
 watch(() => modalStored.getShowModal, (value) => {
@@ -588,7 +610,32 @@ watch(() => modalStored.getModalType, (value) => {
             v-if="annotations && annotations.length > 0"
             class="anotaciones-data"
           >
-            <p>{{ annotations }}</p>
+            <table >
+              <thead>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Confirmado</th>
+                <th>Opciones</th>
+              </thead>
+              <tbody>
+                <tr v-for="annotation in annotations "
+                  :key="annotation.codigo">
+                  <td>{{ annotation.fecha }}</td>
+                  <td>{{ annotation.tipo }}</td>
+                  <td>{{ annotation.confirmado }}</td>
+                  <td class="icons">
+                    <font-awesome-icon
+                      :icon="['fas', 'pen-to-square']"
+                      @click="editAnnotation(annotation.codigo)"
+                    />
+                    <font-awesome-icon
+                      :icon="['fas', 'trash']"
+                      @click="deleteAnnotation(annotation.codigo)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </section>
           <section v-else class="noData">No hay anotaciones 😢</section>
         </section>

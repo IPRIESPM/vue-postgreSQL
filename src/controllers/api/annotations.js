@@ -55,3 +55,24 @@ export async function getContactAnnotationFromApi(contactN) {
     return false;
   }
 }
+
+export async function deleteAnnotationFromApi(id) {
+  const url = serverPath + id;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('token'),
+      },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
