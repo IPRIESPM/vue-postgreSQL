@@ -16,7 +16,6 @@ library.add(
   solidIcons.faBuilding,
   solidIcons.faMobile,
   solidIcons.faEnvelope,
-  solidIcons.faAddressCard,
   solidIcons.faAddressBook,
   solidIcons.faHomeUser,
   solidIcons.faUserGraduate,
