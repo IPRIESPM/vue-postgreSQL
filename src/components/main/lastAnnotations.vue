@@ -19,6 +19,12 @@ onMounted(async () => {
     </section>
     <section class="main" v-else>
         {{ lastAnnotation  }}
+        <ul v-for="annotation in lastAnnotation" :key="annotation.codigo">
+            <p>{{ annotation.nombre_profesor }}</p>
+            <p>{{ annotation.fecha }}</p>
+            <p>{{ annotation.confirmado }}</p>
+            <p>{{ annotation.tipo }}</p>
+        </ul>
     </section>
 </template>
 <style scoped>
