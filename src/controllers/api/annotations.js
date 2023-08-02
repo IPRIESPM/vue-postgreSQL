@@ -56,6 +56,28 @@ export async function getContactAnnotationFromApi(contactN) {
   }
 }
 
+export async function getLastAnnotationFromApi() {
+  const url = serverPath;
+  try {
+    const response = await fetch(url, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('token'),
+      },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    return false;
+  }
+}
+
 export async function deleteAnnotationFromApi(id) {
   const url = serverPath + id;
   try {

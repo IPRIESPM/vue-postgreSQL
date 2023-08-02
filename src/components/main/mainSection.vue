@@ -5,6 +5,7 @@ import ShowCompanys from './showCompanys.vue';
 import ShowTeachers from './showTeachers.vue';
 import UserProfile from './userProfile.vue';
 import CompanyProfile from './companyProfile.vue';
+import LastAnnotations from './lastAnnotations.vue';
 
 const props = defineProps({
   section: {
@@ -22,6 +23,7 @@ const props = defineProps({
                   <ShowTeachers v-if="props.section=='profesores'" />
                   <UserProfile v-if="props.section=='perfil'" />
                   <CompanyProfile v-if="props.section=='empresa'" />
+                  <LastAnnotations v-if="props.section=='dashboard'" />
                 </section>
 
                </section>
