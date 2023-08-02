@@ -620,9 +620,9 @@ watch(() => modalStored.getModalType, (value) => {
               <tbody>
                 <tr v-for="annotation in annotations "
                   :key="annotation.codigo">
-                  <td>{{ annotation.fecha }}</td>
+                  <td>{{  new Date(annotation.fecha).toLocaleDateString() }}</td>
                   <td>{{ annotation.tipo }}</td>
-                  <td>{{ annotation.confirmado }}</td>
+                  <td>{{ annotation.confirmado ? "Confirmado" : "Sin confirmar"  }}</td>
                   <td class="icons">
                     <font-awesome-icon
                       :icon="['fas', 'pen-to-square']"
