@@ -47,6 +47,7 @@ const resetFromData = () => {
 };
 const buttonModal = () => {
   modalStored.setShowModal(false);
+  modalStored.setEditMode(false);
 };
 const onSubmit = async (event) => {
   event.preventDefault();
@@ -89,12 +90,20 @@ watch(
     contactSelected.value = value;
   },
 );
+
+watch(
+  () => modalStored.getEditMode,
+  (value) => {
+    editMode.value = value;
+  },
+);
 </script>
 <template>
 
   <form @submit.prevent="onSubmit">
     <section class="header">
-      <h2>Añadir anotación</h2>
+      <h2 v-if="modalStored.getEditMode" >Editar anotación</h2>
+      <h2 v-else>Añadir anotación</h2>
     </section>
     <section class="error">
       <p v-if="error">{{ errorMessages }}</p>

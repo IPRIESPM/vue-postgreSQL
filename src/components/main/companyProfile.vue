@@ -252,7 +252,12 @@ const editPosition = async (positionCod) => {
   editMode.value = true;
   buttonAdd('puestos');
 };
-
+const editAnnotation = async (annotationCod) => {
+  console.log('editando', annotationCod);
+  editMode.value = true;
+  modalStored.setEditMode(true);
+  buttonAdd('anotaciones');
+};
 const deleteContact = async (contactN) => {
   const response = await deleteContactFromApi(contactN);
   if (response) {

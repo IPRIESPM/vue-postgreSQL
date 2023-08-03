@@ -5,9 +5,11 @@ export default defineStore('modal', {
   state: () => ({
     loading: ref(false),
     showModal: ref(false),
+    editMode: ref(false),
   }),
   getters: {
     getLoading: (state) => state.loading,
+    getEditMode: (state) => state.editMode,
     getShowModal: (state) => state.showModal,
   },
   actions: {
@@ -16,6 +18,9 @@ export default defineStore('modal', {
     },
     setShowModal(showModal) {
       this.showModal = showModal;
+    },
+    setEditMode(editMode) {
+      this.editMode = editMode;
     },
   },
   persist: {
