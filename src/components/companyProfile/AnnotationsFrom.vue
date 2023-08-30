@@ -5,13 +5,17 @@ import {
 import RoundedButton from '../buttons/roundedButton.vue';
 import SubmitButton from '../buttons/submitButton.vue';
 import companyStore from '../../store/perfilEmpresa';
+
 import modalStore from '../../store/modal';
 import userStore from '../../store/user';
-import { newAnnotation } from '../../controllers/api/annotations';
+import annotationStore from '../../store/annotations';
+
+import { newAnnotation, updateAnnotationFromApi } from '../../controllers/api/annotations';
 
 const companyStored = companyStore();
 const modalStored = modalStore();
 const userStored = userStore();
+const annotationStored = annotationStore();
 
 const loading = ref(false);
 const contactSelected = ref('');
@@ -34,6 +38,7 @@ const selectedAnnotationData = ref({
   contactoN: contactSelected.value,
   profesorDni: userStored.getUser.dni,
 });
+
 const resetFromData = () => {
   selectedAnnotationData.value = {
     anyo: actualYear.value,
@@ -45,10 +50,13 @@ const resetFromData = () => {
     profesorDni: userStored.getUser,
   };
 };
+
 const buttonModal = () => {
   modalStored.setShowModal(false);
   modalStored.setEditMode(false);
+  annotationStored.$reset();
 };
+
 const onSubmit = async (event) => {
   event.preventDefault();
   console.log('Enviando anotacion...');
@@ -56,28 +64,36 @@ const onSubmit = async (event) => {
   selectedAnnotationData.value.contactoN = contactSelected.value;
   let response;
   if (editMode.value) {
-    // response = await updateContactFromApi(newContactData.value);
+    console.log('editando anotacion');
+    console.log('anotacion', selectedAnnotationData.value);
+    selectedAnnotationData.value.codigo = companyStored.getAnnotation.cod;
+    response = await updateAnnotationFromApi(selectedAnnotationData.value);
   } else {
+    console.log('añadiendo anotacion');
     console.log(selectedAnnotationData.value);
     response = await newAnnotation(selectedAnnotationData.value);
   }
 
   if (response) {
-    companyStored.setAnnotations(selectedAnnotationData.value);
     loading.value = false;
     resetFromData();
     buttonModal();
     editMode.value = false;
+    modalStored.response = true;
   } else {
     loading.value = false;
     error.value = true;
     errorMessages.value = 'Error al añadir la anotacion';
+    modalStored.response = false;
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = false;
   contactSelected.value = companyStored.selectedContact.contacto_n;
+  selectedAnnotationData.value = annotationStored.getAnnotation;
+  console.log('selectedAnnotationData', selectedAnnotationData.value);
+  editMode.value = modalStored.getEditMode;
 });
 
 onBeforeMount(() => {
@@ -99,10 +115,9 @@ watch(
 );
 </script>
 <template>
-
   <form @submit.prevent="onSubmit">
     <section class="header">
-      <h2 v-if="modalStored.getEditMode" >Editar anotación</h2>
+      <h2 v-if="modalStored.getEditMode">Editar anotación</h2>
       <h2 v-else>Añadir anotación</h2>
     </section>
     <section class="error">
@@ -120,7 +135,7 @@ watch(
             min="2010"
             class="required"
             :placeholder="actualYear"
-            v-model="selectedAnnotationData.anyo"
+            v-model="selectedAnnotationData.year"
             @change="onChange"
           />
         </fieldset>
@@ -133,7 +148,7 @@ watch(
             min="2010"
             class="required"
             :placeholder="actualDay"
-            v-model="selectedAnnotationData.fecha"
+            v-model="selectedAnnotationData.date"
             @change="onChange"
           />
         </fieldset>
@@ -141,7 +156,7 @@ watch(
       <section class="fieldset-group">
         <fieldset>
             <label for="tipo">Tipo</label>
-            <select name="tipo" id="tipo" v-model="selectedAnnotationData.tipo">
+            <select name="tipo" id="tipo" v-model="selectedAnnotationData.type">
               <option value="Teléfono" selected>Teléfono</option>
               <option value="Correo">Correo</option>
               <option value="Persona">Persona</option>
@@ -153,7 +168,7 @@ watch(
               type="checkbox"
               name="confirmado"
               id="confirmado"
-              v-model="selectedAnnotationData.confirmado"
+              v-model="selectedAnnotationData.confirmed"
             />
           </fieldset>
       </section>
@@ -164,7 +179,7 @@ watch(
             id="funciones"
             cols="30"
             rows="10"
-            v-model="selectedAnnotationData.anotacion"
+            v-model="selectedAnnotationData.annotation"
           ></textarea>
         </fieldset>
     </section>
