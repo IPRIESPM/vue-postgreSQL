@@ -98,3 +98,33 @@ export async function deleteAnnotationFromApi(id) {
     return false;
   }
 }
+
+export async function updateAnnotationFromApi(data) {
+  const {
+    codigo, anyo, fecha, tipo, anotacion, confirmado, profesorDni,
+  } = data;
+
+  const url = serverPath + codigo;
+
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      body: JSON.stringify({
+        codigo, anyo, fecha, tipo, anotacion, confirmado, profesorDni,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: Cookies.get('token'),
+      },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    return false;
+  }
+}

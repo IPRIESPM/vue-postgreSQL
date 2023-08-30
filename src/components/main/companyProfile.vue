@@ -1,23 +1,29 @@
 <script setup>
 import {
-  ref, onMounted, onBeforeMount,
-  watch,
+  ref, onMounted, onBeforeMount, watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
 import companyStore from '../../store/perfilEmpresa';
-import companyProfile from '../../controllers/api/companyProfile';
+import modalStore from '../../store/modal';
+
 import RoundedButton from '../buttons/roundedButton.vue';
 import SubmitButton from '../buttons/submitButton.vue';
+import ContactsFrom from '../companyProfile/ContactsFrom.vue';
 import AnnotationsFrom from '../companyProfile/AnnotationsFrom.vue';
-import {
-  newContact,
-  updateContactFromApi,
-  deleteContactFromApi,
-} from '../../controllers/api/contacts';
-import { newPosition, updatePositionFromApi, deletePositionFromApi } from '../../controllers/api/positions';
-import { getContactAnnotationFromApi, deleteAnnotationFromApi } from '../../controllers/api/annotations';
+import ContactsModule from '../companyProfile/ContactsModule.vue';
+import AnnotationsModule from '../companyProfile/AnnotationsModule.vue';
 import LoadingText from '../loading/loadingText.vue';
-import modalStore from '../../store/modal';
+
+import companyProfile from '../../controllers/api/companyProfile';
+import {
+  newPosition,
+  updatePositionFromApi,
+  deletePositionFromApi,
+} from '../../controllers/api/positions';
+import {
+  getContactAnnotationFromApi,
+  deleteAnnotationFromApi,
+} from '../../controllers/api/annotations';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -46,18 +52,6 @@ const editMode = ref(false);
 
 const onChange = (event) => {
   event.target.setCustomValidity('');
-};
-
-const getClass = (contactN) => {
-  if (selectedContact.value.n === contactN) {
-    return 'selected';
-  }
-  return '';
-};
-
-const selectContact = (n) => {
-  console.log('seleccionando', n);
-  companyStored.setSelectedContact(n);
 };
 
 const newContactData = ref({
@@ -128,73 +122,73 @@ const buttonAdd = (type) => {
     resetContactFromData();
     return;
   }
+  console.log('Añadiendo', type);
+  console.log('edit', editMode.value);
   console.log('La empresa es:', profile.value.cif);
   modalStored.setShowModal(true);
   showModal.value = modalStored.getShowModal;
   modalType.value = type;
 };
 
-const onSubmitContact = async (event) => {
-  event.preventDefault();
-  loading.value = true;
+// const onSubmitContact = async (event) => {
+//   event.preventDefault();
+//   loading.value = true;
 
-  let response;
-  const inputNames = [
-    'nombre',
-    'correo',
-    'telefono'];
-  const inputCustomValidity = {
-    nombre: 'Debes introducir un nombre',
-    correo: 'Debes introducir un correo',
-    telefono: 'Debes introducir un teléfono',
-  };
+//   let response;
+//   const inputNames = [
+//     'nombre',
+//     'correo',
+//     'telefono'];
+//   const inputCustomValidity = {
+//     nombre: 'Debes introducir un nombre',
+//     correo: 'Debes introducir un correo',
+//     telefono: 'Debes introducir un teléfono',
+//   };
 
-  inputNames.forEach((inputName) => {
-    const input = event.target.querySelector(`input[name="${inputName}"]`);
-    const inputValue = newContactData.value[inputName];
-    if (inputValue === '') {
-      input.setCustomValidity(inputCustomValidity[inputName]);
-    } else {
-      input.setCustomValidity('');
-    }
-  });
-  if (!event.target.checkValidity()) {
-    loading.value = false;
-    return;
-  }
-  if (editMode.value) {
-    newContactData.value.empresa = profile.value.cif;
-    response = await updateContactFromApi(newContactData.value);
-  } else {
-    response = await newContact(newContactData.value);
-  }
-  if (response) {
-    buttonAdd('close');
-    loading.value = false;
-    resetContactFromData();
-    await getCompanyProfile();
+//   inputNames.forEach((inputName) => {
+//     const input = event.target.querySelector(`input[name="${inputName}"]`);
+//     const inputValue = newContactData.value[inputName];
+//     if (inputValue === '') {
+//       input.setCustomValidity(inputCustomValidity[inputName]);
+//     } else {
+//       input.setCustomValidity('');
+//     }
+//   });
+//   if (!event.target.checkValidity()) {
+//     loading.value = false;
+//     return;
+//   }
+//   if (editMode.value) {
+//     newContactData.value.empresa = profile.value.cif;
+//     response = await updateContactFromApi(newContactData.value);
+//   } else {
+//     response = await newContact(newContactData.value);
+//   }
+//   if (response) {
+//     buttonAdd('close');
+//     loading.value = false;
+//     resetContactFromData();
+//     await getCompanyProfile();
 
-    editMode.value = false;
-  } else {
-    loading.value = false;
-    errorMessages.value = 'Error al añadir el contacto';
-  }
-};
+//     editMode.value = false;
+//   } else {
+//     loading.value = false;
+//     errorMessages.value = 'Error al añadir el contacto';
+//   }
+// };
 
 const onSubmitPositions = async (event) => {
   event.preventDefault();
   loading.value = true;
 
-  const inputNames = [
-    'anyo',
-    'vacantes',
-    'horario'];
+  const inputNames = ['anyo', 'vacantes', 'horario'];
 
   const inputCustomValidity = {
     anyo: 'Debes introducir un año ',
     vacantes: 'Debes introducir un número de vacantes',
     horario: 'Debes establecer un horario',
-    ciclo: 'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
+    ciclo:
+      'El ciclo debe ser uno de los siguientes: FPB, SMR, DAM, DAW, ASIR, IMSA',
   };
 
   inputNames.forEach((inputName) => {
@@ -232,14 +226,6 @@ const onSubmitPositions = async (event) => {
   }
 };
 
-const editContact = async (contactN) => {
-  newContactData.value = {
-    ...contacts.value.find((contact) => contact.n === contactN),
-  };
-  editMode.value = true;
-  buttonAdd('contactos');
-};
-
 const editPosition = async (positionCod) => {
   console.log('editando', positionCod);
   newPositionData.value = {
@@ -256,16 +242,18 @@ const editAnnotation = async (annotationCod) => {
   console.log('editando', annotationCod);
   editMode.value = true;
   modalStored.setEditMode(true);
+  modalStored.setEditZone('annotation');
+  companyStored.setSelectedAnnotation(annotationCod);
   buttonAdd('anotaciones');
 };
-const deleteContact = async (contactN) => {
-  const response = await deleteContactFromApi(contactN);
-  if (response) {
-    await getCompanyProfile();
-  } else {
-    errorMessages.value = 'Error al eliminar el contacto';
-  }
-};
+// const deleteContact = async (contactN) => {
+//   const response = await deleteContactFromApi(contactN);
+//   if (response) {
+//     await getCompanyProfile();
+//   } else {
+//     errorMessages.value = 'Error al eliminar el contacto';
+//   }
+// };
 
 const deletePosition = async (positionCod) => {
   const response = await deletePositionFromApi(positionCod);
@@ -278,7 +266,11 @@ const deletePosition = async (positionCod) => {
 
 const updateAnnotations = async () => {
   loading.value = true;
-  annotations.value = await getContactAnnotationFromApi(selectedContact.value.n);
+  console.log('actualizando anotaciones');
+  annotations.value = await getContactAnnotationFromApi(
+    selectedContact.value.n,
+  );
+  // companyStored.updateAnnotations(annotations.value);
   loading.value = false;
 };
 
@@ -293,7 +285,7 @@ const deleteAnnotation = async (annotationCod) => {
   loading.value = false;
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   if (companyStored.getEmpresaSelected === '') {
     router.push({ name: 'empresas' });
   }
@@ -302,152 +294,41 @@ onBeforeMount(() => {
 onMounted(async () => {
   if (companyStored.getEmpresaSelected !== '') {
     loading.value = true;
-    selectedCompany.value = await companyProfile(companyStored.getEmpresaSelected);
+    selectedCompany.value = await companyProfile(
+      companyStored.getEmpresaSelected,
+    );
     companyStored.updateEmpresa(selectedCompany.value);
     await getCompanyProfile();
     companyStored.setSelectedContact(companyStored.getPrincipalContact.n);
+    companyStored.profesor = selectedCompany.value.empresa.dni_profesor;
     loading.value = false;
   }
 });
 
-watch(() => companyStored.selectedContact, async (value) => {
-  console.log('cambiando', value);
-  selectedContact.value = value;
-  annotations.value = await getContactAnnotationFromApi(value.n);
-  console.log('anotaciones', annotations.value);
-});
-
-watch(() => companyStored.getAnnotations, async (value) => {
-  console.log('cambiando', value);
-  annotations.value = await getContactAnnotationFromApi(value.contactoN);
-  console.log('anotaciones', annotations.value);
-});
-
-watch(() => modalStored.getShowModal, (value) => {
-  showModal.value = value;
-});
-
-watch(() => modalStored.getModalType, (value) => {
-  modalType.value = value;
-});
-
+watch(
+  () => modalStored.getShowModal,
+  (value) => {
+    console.log('[watch] modal', value);
+    showModal.value = value;
+    modalType.value = modalStored.getModalType;
+    if (showModal.value === false) {
+      buttonAdd('close');
+    }
+  },
+);
 </script>
 
 <template>
-  <section class="modal" v-if="showModal" :class="{ 'is-active': showModal }" :key="showModal">
-
+  <section
+    class="modal"
+    v-if="showModal"
+    :class="{ 'is-active': showModal }"
+    :key="showModal"
+  >
     <section class="modal-main">
 
-      <form v-if="modalType === 'contactos'" @submit="onSubmitContact">
-
-        <section class="header">
-          <h2 v-if="editMode">Editar contacto</h2>
-          <h2 v-else>Añadir nuevo contacto</h2>
-        </section>
-        <section class="error">
-          <p v-if="error">{{ errorMessages }}</p>
-        </section>
-        <section class="main">
-          <section class="fieldset-group">
-            <fieldset>
-              <label for="dni">Dni</label>
-              <input
-                type="text"
-                name="dni"
-                id="dni"
-                placeholder="12345678A"
-                v-model="newContactData.dni"
-              />
-            </fieldset>
-            <fieldset>
-              <label for="nombre">Nombre</label>
-              <input
-                type="text"
-                name="nombre"
-                id="nombre"
-                placeholder="Silvia Amorós"
-                v-model="newContactData.nombre"
-                class="required"
-                autofocus
-              />
-            </fieldset>
-          </section>
-
-          <section class="fieldset-group">
-            <fieldset>
-              <label for="correo">Correo</label>
-              <input
-                type="email"
-                name="correo"
-                id="correo"
-                placeholder="example@example"
-                class="required"
-                v-model="newContactData.correo"
-              />
-            </fieldset>
-
-            <fieldset>
-              <label for="telefono">Telefono</label>
-              <input
-                type="tel"
-                name="telefono"
-                id="telefono"
-                class="required"
-                placeholder="612345678"
-                v-model="newContactData.telefono"
-              />
-            </fieldset>
-          </section>
-        </section>
-        <section class="fieldset-group">
-          <fieldset>
-            <label for="tipo">Tipo</label>
-            <select name="tipo" id="tipo" v-model="newContactData.tipo">
-              <option value="Gerente">Gerente</option>
-              <option value="Jefe Proyecto">Jefe Proyecto</option>
-              <option value="Técnico">Técnico</option>
-              <option value="Tutor">Tutor</option>
-              <option value="RRHH">RRHH</option>
-            </select>
-          </fieldset>
-          <fieldset class="checkbox">
-            <label for="principal">Principal</label>
-            <input
-              type="checkbox"
-              name="principal"
-              id="principal"
-              v-model="newContactData.principal"
-            />
-          </fieldset>
-        </section>
-
-        <fieldset>
-          <label for="funciones">Funciones</label>
-          <textarea
-            name="funciones"
-            id="funciones"
-            cols="30"
-            rows="10"
-            v-model="newContactData.funciones"
-          ></textarea>
-        </fieldset>
-
-        <section class="button-group">
-          <SubmitButton
-            :idleText="editMode ? 'Editar' : 'Añadir'"
-            :loading="loading"
-            loadingText="Cargando"
-          />
-          <button type="button" class="cancel" @click="buttonAdd('close')">
-            Cancelar
-          </button>
-          <RoundedButton
-            :modal=showModal
-            :class="{ 'modal': showModal }"
-            class="contacts"
-            @click="buttonAdd('close')"/>
-        </section>
-      </form>
+      <ContactsFrom v-if="modalType == 'contacts'" />
+      <AnnotationsFrom v-if="modalType == 'annotations'" />
 
       <form v-if="modalType === 'puestos'" @submit="onSubmitPositions">
         <section class="header">
@@ -524,7 +405,7 @@ watch(() => modalStored.getModalType, (value) => {
             rows="10"
             maxlength="200"
             v-model="newPositionData.descrip"
-            >
+          >
           </textarea>
         </fieldset>
 
@@ -538,15 +419,15 @@ watch(() => modalStored.getModalType, (value) => {
             Cancelar
           </button>
           <RoundedButton
-            :modal=showModal
-            :class="{ 'modal': showModal }"
+            :modal="showModal"
+            :class="{ modal: showModal }"
             class="position"
-            @click="buttonAdd('close')"/>
+            @click="buttonAdd('close')"
+          />
         </section>
       </form>
 
-      <AnnotationsFrom v-if="modalType === 'anotaciones'"/>
-
+      <AnnotationsFrom v-if="modalType === 'anotaciones'" />
     </section>
   </section>
   <section class="main" v-else-if="!loading">
@@ -565,126 +446,46 @@ watch(() => modalStored.getModalType, (value) => {
       </p>
     </section>
     <section class="contacts">
-      <header>
-        <h2>Contactos</h2>
-        <RoundedButton
-          :modal=false
-          @click="buttonAdd('contactos')"
-          :shadow=false
-        />
-      </header>
-      <section class="contact-data" v-if="contacts && contacts.length > 0">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Correo</th>
-              <th class="empty">Opciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="contact in contacts" :key="contact.n" @click="selectContact(contact.n)">
-              <td :class="getClass(contact.n)">{{ contact.nombre }}</td>
-              <td :class="getClass(contact.n)">{{ contact.telefono }}</td>
-              <td :class="getClass(contact.n)">{{ contact.correo }}</td>
-              <td :class="getClass(contact.n)" class="icons">
-                <font-awesome-icon
-                  :icon="['fas', 'pen-to-square']"
-                  @click="editContact(contact.n)"
-                />
-                <font-awesome-icon
-                  :icon="['fas', 'trash']"
-                  @click="deleteContact(contact.n)"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <section class="anotaciones">
-          <header>
-          <h3>Anotaciones</h3>
-          <RoundedButton
-            :shadow=false
-            :modal=showModal
-            @click="buttonAdd('anotaciones')"
-            size="sm"
-          />
-        </header>
-          <section
-            v-if="annotations && annotations.length > 0"
-            class="anotaciones-data"
-          >
-            <table >
-              <thead>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Confirmado</th>
-                <th>Opciones</th>
-              </thead>
-              <tbody>
-                <tr v-for="annotation in annotations "
-                  :key="annotation.codigo">
-                  <td>{{  new Date(annotation.fecha).toLocaleDateString() }}</td>
-                  <td>{{ annotation.tipo }}</td>
-                  <td>{{ annotation.confirmado ? "Confirmado" : "Sin confirmar"  }}</td>
-                  <td class="icons">
-                    <font-awesome-icon
-                      :icon="['fas', 'pen-to-square']"
-                      @click="editAnnotation(annotation.codigo)"
-                    />
-                    <font-awesome-icon
-                      :icon="['fas', 'trash']"
-                      @click="deleteAnnotation(annotation.codigo)"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-          <section v-else class="noData">No hay anotaciones 😢</section>
-        </section>
-      </section>
-      <section class="noData" v-else>
-        <p>No hay contactos 😢</p>
-      </section>
+      <ContactsModule />
     </section>
+    <section class="annotations"></section>
     <section class="puestos">
       <header>
         <h2>Puestos</h2>
         <RoundedButton
-          :modal=showModal
-          :shadow=false
-          @click="buttonAdd('puestos')"/>
+          :modal="showModal"
+          :shadow="false"
+          @click="buttonAdd('puestos')"
+        />
       </header>
       <table class="table positions" v-if="puestos && puestos.length > 0">
         <thead>
           <tr>
-          <th>Año</th>
-          <th>Horario</th>
-          <th>Ciclo</th>
-          <th>Vacantes</th>
-          <th>Descripción</th>
-          <th class="empty">Opciones</th>
-        </tr>
+            <th>Año</th>
+            <th>Horario</th>
+            <th>Ciclo</th>
+            <th>Vacantes</th>
+            <th>Descripción</th>
+            <th class="empty">Opciones</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="puesto in puestos" :key="puesto.cod">
-            <td >{{ puesto.anyo }}</td>
+            <td>{{ puesto.anyo }}</td>
             <td>{{ puesto.horario }}</td>
             <td>{{ puesto.ciclo }}</td>
             <td>{{ puesto.vacantes }}</td>
             <td>{{ puesto.descrip }}</td>
             <td class="icons">
-                <font-awesome-icon
-                  :icon="['fas', 'pen-to-square']"
-                  @click="editPosition(puesto.cod)"
-                />
-                <font-awesome-icon
-                  :icon="['fas', 'trash']"
-                  @click="deletePosition(puesto.cod)"
-                />
-              </td>
+              <font-awesome-icon
+                :icon="['fas', 'pen-to-square']"
+                @click="editPosition(puesto.cod)"
+              />
+              <font-awesome-icon
+                :icon="['fas', 'trash']"
+                @click="deletePosition(puesto.cod)"
+              />
+            </td>
           </tr>
         </tbody>
       </table>
@@ -798,15 +599,15 @@ header span {
   gap: 0.5em;
 }
 
-button.add.annotations{
+button.add.annotations {
   position: absolute;
   transform: translate(400px, -700px);
 }
-button.add.position{
+button.add.position {
   position: absolute;
   transform: translate(240px, -690px);
 }
-button.add.contacts{
+button.add.contacts {
   position: absolute;
   transform: translate(240px, -800px);
 }
@@ -816,10 +617,14 @@ section.error {
   margin-bottom: 1rem;
   height: 30px;
 }
-table.table.positions{
+table.table.positions {
   text-align: center;
 }
-td.selected{
-  background:var(--color-background-soft);;
+td.selected {
+  background: var(--color-background-soft);
+}
+
+.icons svg {
+  cursor: pointer;
 }
 </style>

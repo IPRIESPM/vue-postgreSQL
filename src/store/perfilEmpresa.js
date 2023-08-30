@@ -15,6 +15,7 @@ export default defineStore('empresa', {
     anotaciones: ref([]),
     empresaSeleccionada: ref({}),
     selectedContact: ref({}),
+    selectedAnnotation: ref({}),
   }),
   getters: {
     getEmpresa: (state) => state,
@@ -24,9 +25,15 @@ export default defineStore('empresa', {
 
   },
   actions: {
-    setAnnotations(annotations) {
-      console.log(annotations);
-      this.anotaciones = annotations;
+    updateAnnotations(anotaciones) {
+      this.anotaciones = anotaciones;
+    },
+    updateAnnotation(anotacion) {
+      const index = this.anotaciones.findIndex((anot) => anot.codigo === anotacion.codigo);
+      this.anotaciones[index] = anotacion;
+    },
+    addAnnotation(anotacion) {
+      this.anotaciones.push(anotacion);
     },
     updateEmpresa(objeto) {
       console.log(objeto);
@@ -60,6 +67,10 @@ export default defineStore('empresa', {
     },
     setSelectedContact(n) {
       this.selectedContact = this.contactos.find((contacto) => contacto.n === n);
+    },
+    setSelectedAnnotation(n) {
+      console.log('buscando anotacion con codigo: ', n);
+      this.selectedAnnotation = this.anotaciones.find((anotacion) => anotacion.codigo === n);
     },
   },
   persist: {

@@ -30,13 +30,27 @@ export default async function getContactsById(cif) {
 export async function newContact(data) {
   const url = serverPath;
   const {
-    dni, nombre, correo, telefono, tipo, principal, funciones, empresa,
+    dni,
+    name: nombre,
+    email: correo,
+    phone: telefono,
+    type: tipo,
+    principal,
+    functions: funciones,
+    company: empresa,
   } = data;
   try {
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        dni, nombre, correo, telefono, tipo, principal, funciones, empresa,
+        dni,
+        nombre,
+        correo,
+        telefono,
+        tipo,
+        principal,
+        funciones,
+        empresa,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -58,14 +72,14 @@ export async function newContact(data) {
 export async function updateContactFromApi(data) {
   const {
     n,
-    nombre,
-    correo,
-    telefono,
+    name: nombre,
+    email: correo,
+    phone: telefono,
     dni,
-    tipo,
+    type: tipo,
     principal,
-    funciones,
-    empresa,
+    functions: funciones,
+    company: empresa,
   } = data;
 
   const url = serverPath;
@@ -96,6 +110,7 @@ export async function updateContactFromApi(data) {
     }
 
     const responseData = await response.json();
+    console.log('Respuesta', responseData);
     return responseData;
   } catch (error) {
     return false;
