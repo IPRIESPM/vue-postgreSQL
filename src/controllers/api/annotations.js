@@ -100,18 +100,12 @@ export async function deleteAnnotationFromApi(id) {
 }
 
 export async function updateAnnotationFromApi(data) {
-  const {
-    codigo, anyo, fecha, tipo, anotacion, confirmado, profesorDni,
-  } = data;
-
-  const url = serverPath + codigo;
+  const url = serverPath + data.cod;
 
   try {
     const response = await fetch(url, {
       method: 'PUT',
-      body: JSON.stringify({
-        codigo, anyo, fecha, tipo, anotacion, confirmado, profesorDni,
-      }),
+      body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json',
         Authorization: Cookies.get('token'),

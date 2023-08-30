@@ -65,8 +65,7 @@ const onSubmit = async (event) => {
   let response;
   if (editMode.value) {
     console.log('editando anotacion');
-    console.log('anotacion', selectedAnnotationData.value);
-    selectedAnnotationData.value.codigo = companyStored.getAnnotation.cod;
+    console.log('anotacion', selectedAnnotationData.value.cod);
     response = await updateAnnotationFromApi(selectedAnnotationData.value);
   } else {
     console.log('añadiendo anotacion');

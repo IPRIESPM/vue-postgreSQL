@@ -11,7 +11,6 @@ import SubmitButton from '../buttons/submitButton.vue';
 import ContactsFrom from '../companyProfile/ContactsFrom.vue';
 import AnnotationsFrom from '../companyProfile/AnnotationsFrom.vue';
 import ContactsModule from '../companyProfile/ContactsModule.vue';
-import AnnotationsModule from '../companyProfile/AnnotationsModule.vue';
 import LoadingText from '../loading/loadingText.vue';
 
 import companyProfile from '../../controllers/api/companyProfile';
@@ -238,22 +237,6 @@ const editPosition = async (positionCod) => {
   editMode.value = true;
   buttonAdd('puestos');
 };
-const editAnnotation = async (annotationCod) => {
-  console.log('editando', annotationCod);
-  editMode.value = true;
-  modalStored.setEditMode(true);
-  modalStored.setEditZone('annotation');
-  companyStored.setSelectedAnnotation(annotationCod);
-  buttonAdd('anotaciones');
-};
-// const deleteContact = async (contactN) => {
-//   const response = await deleteContactFromApi(contactN);
-//   if (response) {
-//     await getCompanyProfile();
-//   } else {
-//     errorMessages.value = 'Error al eliminar el contacto';
-//   }
-// };
 
 const deletePosition = async (positionCod) => {
   const response = await deletePositionFromApi(positionCod);
@@ -271,17 +254,6 @@ const updateAnnotations = async () => {
     selectedContact.value.n,
   );
   // companyStored.updateAnnotations(annotations.value);
-  loading.value = false;
-};
-
-const deleteAnnotation = async (annotationCod) => {
-  loading.value = true;
-  const response = await deleteAnnotationFromApi(annotationCod);
-
-  if (!response) {
-    console.log('Error al eliminar la anotación');
-  }
-  updateAnnotations();
   loading.value = false;
 };
 
