@@ -403,6 +403,8 @@ button.update {
   outline: none;
   background-color: transparent;
 
+  border: 2px solid var(--color-text-muted);
+
 }
 
 section.modal {
@@ -485,7 +487,6 @@ td {
 
 td.icons {
   display: flex;
-  justify-content: space-around;
   align-items: center;
 }
 

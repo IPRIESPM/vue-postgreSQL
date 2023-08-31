@@ -52,6 +52,10 @@
 
             <td class="icons">
               <font-awesome-icon
+              :icon="['fas', 'eye']"
+              @click="goProfile(company.cif)"
+              />
+              <font-awesome-icon
                 :icon="['fas', 'pen-to-square']"
                 @click="editFormData(company.cif)"
               />
@@ -466,15 +470,6 @@ header {
   padding: 1rem;
 }
 
-button.update {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  border: none;
-  outline: none;
-  background-color: transparent;
-
-}
 section.modal {
   position: fixed;
   display: none;
@@ -555,7 +550,6 @@ td {
 
 td.icons {
   display: flex;
-  justify-content: space-around;
   align-items: center;
 }
 

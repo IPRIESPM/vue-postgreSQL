@@ -6,13 +6,6 @@ form {
 }
 
 
-table{
-    margin: 1em 1em 2em;
-    text-align: left;
-    border-collapse: collapse;
-    height: max-content;
-}
-
 table thead {
     color: var(--color-text-muted);
     text-align: left;
@@ -25,21 +18,22 @@ table thead th {
     border-bottom: 1px solid var(--color-text-muted);
     text-align: left;
     height: 30px;
+    padding: 0 10px;
 }
 
 table tbody td {
     color: var(--color-text-muted);
     border-bottom: 1px solid var(--color-text-muted);
-    height: 30px;
-
+    height: 50px;
+    padding: 0 10px;
 }
 
 td.icons {
-    height: 30px;
+    height: 50px;
     display: flex;
-    justify-content: space-around;
     align-items: center;
-
+    gap: 1rem;
+    justify-content: flex-end;
 }
 
 
@@ -54,16 +48,6 @@ section.loading {
 table {
     width: auto;
     border-collapse: collapse;
-}
-
-table thead th,
-table tbody td {
-    padding: 0 10px;
-}
-
-table tbody td {
-    height: 50px;
-    border-bottom: 1px solid #ccc;
 }
 
 .principal {

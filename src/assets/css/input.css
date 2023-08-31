@@ -114,3 +114,13 @@ input[type="checkbox"]::before{
     transition: border 0.3s ease;
 }
 
+button.update {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    outline: none;
+    background-color: transparent;
+  
+    border: 2px solid var(--color-text-muted);
+  
+}

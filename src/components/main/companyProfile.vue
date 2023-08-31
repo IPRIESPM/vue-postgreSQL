@@ -11,6 +11,7 @@ import SubmitButton from '../buttons/submitButton.vue';
 import ContactsFrom from '../companyProfile/ContactsFrom.vue';
 import AnnotationsFrom from '../companyProfile/AnnotationsFrom.vue';
 import ContactsModule from '../companyProfile/ContactsModule.vue';
+import PositionForm from '../companyProfile/PositionForm.vue';
 import LoadingText from '../loading/loadingText.vue';
 
 import companyProfile from '../../controllers/api/companyProfile';
@@ -19,10 +20,6 @@ import {
   updatePositionFromApi,
   deletePositionFromApi,
 } from '../../controllers/api/positions';
-import {
-  getContactAnnotationFromApi,
-  deleteAnnotationFromApi,
-} from '../../controllers/api/annotations';
 
 const router = useRouter();
 const companyStored = companyStore();
@@ -33,7 +30,6 @@ const rawData = ref('');
 const profile = ref('');
 const contacts = ref('');
 const puestos = ref('');
-const annotations = ref('');
 
 const errorMessages = ref('');
 const error = ref(false);
@@ -42,8 +38,6 @@ const actualYear = new Date().getFullYear();
 
 const showModal = ref(modalStored.getShowModal);
 const modalType = ref(modalStored.getModalType);
-
-const selectedContact = ref({});
 
 const loading = ref(false);
 
@@ -129,53 +123,6 @@ const buttonAdd = (type) => {
   modalType.value = type;
 };
 
-// const onSubmitContact = async (event) => {
-//   event.preventDefault();
-//   loading.value = true;
-
-//   let response;
-//   const inputNames = [
-//     'nombre',
-//     'correo',
-//     'telefono'];
-//   const inputCustomValidity = {
-//     nombre: 'Debes introducir un nombre',
-//     correo: 'Debes introducir un correo',
-//     telefono: 'Debes introducir un teléfono',
-//   };
-
-//   inputNames.forEach((inputName) => {
-//     const input = event.target.querySelector(`input[name="${inputName}"]`);
-//     const inputValue = newContactData.value[inputName];
-//     if (inputValue === '') {
-//       input.setCustomValidity(inputCustomValidity[inputName]);
-//     } else {
-//       input.setCustomValidity('');
-//     }
-//   });
-//   if (!event.target.checkValidity()) {
-//     loading.value = false;
-//     return;
-//   }
-//   if (editMode.value) {
-//     newContactData.value.empresa = profile.value.cif;
-//     response = await updateContactFromApi(newContactData.value);
-//   } else {
-//     response = await newContact(newContactData.value);
-//   }
-//   if (response) {
-//     buttonAdd('close');
-//     loading.value = false;
-//     resetContactFromData();
-//     await getCompanyProfile();
-
-//     editMode.value = false;
-//   } else {
-//     loading.value = false;
-//     errorMessages.value = 'Error al añadir el contacto';
-//   }
-// };
-
 const onSubmitPositions = async (event) => {
   event.preventDefault();
   loading.value = true;
@@ -226,7 +173,9 @@ const onSubmitPositions = async (event) => {
 };
 
 const editPosition = async (positionCod) => {
-  console.log('editando', positionCod);
+  modalStored.setEditMode(true);
+  modalStored.setShowModal(true);
+  modalStored.setModalType('position');
   newPositionData.value = {
     ...puestos.value.find((position) => position.cod === positionCod),
   };
@@ -245,16 +194,6 @@ const deletePosition = async (positionCod) => {
   } else {
     errorMessages.value = 'Error al eliminar el puesto';
   }
-};
-
-const updateAnnotations = async () => {
-  loading.value = true;
-  console.log('actualizando anotaciones');
-  annotations.value = await getContactAnnotationFromApi(
-    selectedContact.value.n,
-  );
-  // companyStored.updateAnnotations(annotations.value);
-  loading.value = false;
 };
 
 onBeforeMount(async () => {
@@ -302,7 +241,7 @@ watch(
       <ContactsFrom v-if="modalType == 'contacts'" />
       <AnnotationsFrom v-if="modalType == 'annotations'" />
 
-      <form v-if="modalType === 'puestos'" @submit="onSubmitPositions">
+      <form v-if="modalType === 'position'" @submit="onSubmitPositions">
         <section class="header">
           <h2 v-if="editMode">Editar puesto</h2>
           <h2 v-else>Añadir nuevos puestos</h2>
