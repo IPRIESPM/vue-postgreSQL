@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref } from 'vue';
+import { defineProps } from 'vue';
 import ProfileButton from '../buttons/profileButton.vue';
 
 const props = defineProps({

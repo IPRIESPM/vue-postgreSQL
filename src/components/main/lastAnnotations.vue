@@ -6,6 +6,24 @@ import LoadingText from '../loading/loadingText.vue';
 const loading = ref(false);
 const lastAnnotation = ref(null);
 
+const modal = ref(false);
+
+const annotationSelected = ref(null);
+
+const showAnnotation = (id) => {
+  console.log(id);
+  lastAnnotation.value.forEach((annotation) => {
+    if (annotation.codigo === id) {
+      console.log('found');
+      annotationSelected.value = annotation;
+      console.log(annotationSelected.value);
+      modal.value = true;
+    }
+  });
+};
+const closeAnnotation = () => {
+  modal.value = false;
+};
 onMounted(async () => {
   console.log('LastAnnotations mounted');
   loading.value = true;
@@ -15,14 +33,54 @@ onMounted(async () => {
 </script>
 <template>
   <LoadingText v-if="loading" />
+
   <section class="main tableData" v-else>
+    <section class="modal"
+      :class="{ 'is-active': modal }"
+      v-if="modal">
+
+      <section class="modal-main">
+        <button @click="closeAnnotation">Salir</button>
+        <h2>Anotación de {{ annotationSelected.nombre_contacto }}</h2>
+        <p>
+          <fieldset>
+            <span>Fecha:</span>
+            {{ new Date(annotationSelected.fecha).toLocaleDateString() }}
+          </fieldset>
+          <fieldset>
+            <span>Confirmado:</span>
+            {{ annotationSelected.verificado ? "Confirmado" : "No confirmado" }}
+          </fieldset>
+          <fieldset>
+            <span>Responsable:</span>
+            {{ annotationSelected.nombre_profesor }}
+          </fieldset>
+
+          <fieldset>
+            <span>Empresa:</span>
+            {{ annotationSelected.nombre_empresa }}
+          </fieldset>
+        </p>
+        <p>
+          <fieldset>
+            <span>Comentario:</span>
+
+            {{ annotationSelected.comentario ? annotationSelected.comentario : "Sin comentario" }}
+          </fieldset>
+        </p>
+      </section>
+    </section>
     <table>
       <thead>
         <tr>
           <th>Fecha</th>
-          <th> <font-awesome-icon :icon="['fas', 'user-graduate']" /> Profesor </th>
-          <th> <font-awesome-icon :icon="['fas', 'building']" /> Empresa </th>
-          <th>  <font-awesome-icon :icon="['fas', 'address-card']" /> Contacto </th>
+          <th>
+            <font-awesome-icon :icon="['fas', 'user-graduate']" /> Profesor
+          </th>
+          <th><font-awesome-icon :icon="['fas', 'building']" /> Empresa</th>
+          <th>
+            <font-awesome-icon :icon="['fas', 'address-card']" /> Contacto
+          </th>
           <th>Verificado</th>
           <th></th>
         </tr>
@@ -33,13 +91,9 @@ onMounted(async () => {
             {{ new Date(annotation.fecha).toLocaleDateString() }}
           </td>
           <td>
-
-            {{
-              annotation.nombre_profesor
-            }}
+            {{ annotation.nombre_profesor }}
           </td>
           <td>
-
             {{ annotation.nombre_empresa }}
           </td>
           <td>
@@ -48,9 +102,9 @@ onMounted(async () => {
           <td>
             {{ annotation.verificado ? "Confirmado" : "No confirmado" }}
           </td>
-          <td class="icons">
+          <td class="icons" @click="showAnnotation(annotation.codigo)">
             <font-awesome-icon :icon="['fas', 'eye']" />
-              Ver comentario
+            Ver comentario
           </td>
         </tr>
       </tbody>
@@ -126,7 +180,6 @@ button.update {
   border: none;
   outline: none;
   background-color: transparent;
-
 }
 section.modal {
   position: fixed;
@@ -136,7 +189,6 @@ section.modal {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-
 }
 
 section.modal.is-active {
@@ -241,4 +293,21 @@ section.editZone {
 .bounce {
   animation: bounce 0.5s 1 linear forwards;
 }
+
+section.modal{
+  section.modal-main{
+    width: 50%;
+    padding: 2rem;
+    background: var(--color-background);
+
+    border-radius: 8px;
+
+    p{
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+  }
+}
+
 </style>

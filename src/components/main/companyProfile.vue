@@ -11,7 +11,6 @@ import SubmitButton from '../buttons/submitButton.vue';
 import ContactsFrom from '../companyProfile/ContactsFrom.vue';
 import AnnotationsFrom from '../companyProfile/AnnotationsFrom.vue';
 import ContactsModule from '../companyProfile/ContactsModule.vue';
-import PositionForm from '../companyProfile/PositionForm.vue';
 import LoadingText from '../loading/loadingText.vue';
 
 import companyProfile from '../../controllers/api/companyProfile';

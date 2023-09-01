@@ -1,6 +1,6 @@
 <template>
   <section>
-    <button class="button" @click="changeColorScheme">
+    <button class="button color-scheme" @click="changeColorScheme">
         <font-awesome-icon v-if="savedTheme === 'dark'" :icon="['fas', 'sun']" />
         <font-awesome-icon v-else :icon="['fas', 'moon']"  />
         <div class="slider round"></div>
@@ -134,5 +134,21 @@ button {
 button:focus {
         outline: none;
         border:solid 1px transparent !important;
+    }
+
+    button.color-scheme{
+      border: solid 2px var(--color-text);
+      border-radius: 100%;
+      width: 25px;
+
+      padding:0;
+      margin: 0;
+
+      padding: 3px
+    }
+
+    button.color-scheme:focus {
+      outline: none;
+      border:solid 2px var(--color-text) !important;
     }
 </style>
