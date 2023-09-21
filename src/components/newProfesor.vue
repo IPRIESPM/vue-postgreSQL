@@ -1,18 +1,17 @@
 <script setup>
 import {
-    newTeacher,
+  newTeacher,
 } from '../controllers/api/teachers';
 
-
 const onSubmit = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData);
-    const loginData = await newTeacher(data);
-    if (loginData) {
-        console.log(`Login correcto ${data}`);
-    }
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+  const loginData = await newTeacher(data);
+  if (loginData) {
+    console.log('Login correcto');
+  }
 };
 </script>
 

@@ -95,7 +95,6 @@ const resetContactFromData = () => {
 };
 
 const getCompanyProfile = async () => {
-  console.log('Actualizando datos');
   loading.value = true;
   const profileApi = await companyProfile(companyStored.getEmpresaSelected);
   loading.value = false;
@@ -114,9 +113,6 @@ const buttonAdd = (type) => {
     resetContactFromData();
     return;
   }
-  console.log('Añadiendo', type);
-  console.log('edit', editMode.value);
-  console.log('La empresa es:', profile.value.cif);
   modalStored.setShowModal(true);
   showModal.value = modalStored.getShowModal;
   modalType.value = type;
@@ -157,8 +153,6 @@ const onSubmitPositions = async (event) => {
     response = await newPosition(newPositionData.value);
   }
 
-  console.log('respuesta del servidor', response);
-
   if (response) {
     buttonAdd('close');
     loading.value = false;
@@ -181,7 +175,6 @@ const editPosition = async (positionCod) => {
   newPositionData.value.cif_company = profile.value.cif;
   newPositionData.value.cod = positionCod;
 
-  console.log('editando', newPositionData.value);
   editMode.value = true;
   buttonAdd('puestos');
 };
@@ -218,7 +211,6 @@ onMounted(async () => {
 watch(
   () => modalStored.getShowModal,
   (value) => {
-    console.log('[watch] modal', value);
     showModal.value = value;
     modalType.value = modalStored.getModalType;
     if (showModal.value === false) {

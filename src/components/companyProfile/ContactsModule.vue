@@ -19,7 +19,6 @@ const contacts = ref([]);
 const principal = ref('');
 
 const selectContact = (id) => {
-  console.log('selectContact: ', id);
   contactStored.selectContact(id);
   contactStored.selected = id;
   principal.value = contactStored.contacts.find((contact) => contact.n === id);
@@ -39,7 +38,6 @@ const editContact = (id) => {
   modalStored.setModalType('contacts');
 };
 const deleteContact = async (id) => {
-  console.log('deleteContact: ', id);
   const response = await deleteContactFromApi(id);
   if (response) {
     contacts.value = contacts.value.filter((cont) => cont.n !== id);
@@ -53,9 +51,9 @@ onMounted(async () => {
   if (!principal.value) {
     [principal.value] = contacts.value;
   }
-  console.log('principal: ', principal.value);
+
   const [selectedContact] = contacts.value.filter((contact) => contact.n === principal.value.n);
-  console.log('selectedContact: ', selectedContact);
+
   if (principal.value) {
     selectContact(principal.value.n);
     contactStored.loading = false;

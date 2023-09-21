@@ -239,15 +239,10 @@ const modalOption = ref('');
 const edit = ref(null);
 
 async function updateData(force = false) {
-  console.log('he conseguido entrar en updateData');
   if (force) {
     console.log('Forzando actualización de datos');
   }
   await getAllData('companys', force);
-  console.log('Actualizando datos');
-  const listadoLocal = companyStored.getEmpresas;
-  console.log('los datos son:');
-  console.log('los datos son:', listadoLocal);
 
   localData.value = companyStored.getEmpresas.listado;
 
@@ -270,7 +265,6 @@ function resetForm() {
 const showHideModal = async () => {
   modal.value = !modal.value;
   if (modal.value) {
-    console.log('actualizando profesores: ');
     await getAllData('teachers', 'force');
     teachersData.value = teacherStored.getProfesores.listado;
   }
@@ -290,7 +284,6 @@ function editFormData(id) {
 }
 
 async function deleteFormData(id) {
-  console.log('Eliminando: ', id);
   loading.value = true;
   await deleteData('companys', id);
   await updateData();
@@ -364,19 +357,12 @@ const onSubmit = async (event) => {
       }
     });
 
-    if (submitError.value) {
-      console.log('Hay errores en el formulario');
-      return;
-    }
+    if (submitError.value) return;
 
-    console.log('Estoy creando una nueva empresa');
     responseData = await newCompany(data);
     if (responseData) {
-      console.log('La empresa se ha creado correctamente');
       submitLoading.value = false;
-      console.log('Actualizando datos');
       updateData(true);
-      console.log('Datos actualizados');
       modal.value = false;
     } else {
       errorMessage.value = 'Error al añadir';
@@ -389,9 +375,7 @@ const onSubmit = async (event) => {
 };
 
 const goProfile = (cif) => {
-  console.log('cif: ', cif);
   profileStored.selectEmpresa(cif);
-  console.log('La empresa seleccionada es:', profileStored.getEmpresaSelected);
   router.push({ name: 'empresa' });
 };
 

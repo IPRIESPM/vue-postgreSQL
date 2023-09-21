@@ -32,7 +32,6 @@ const closeModal = () => {
 
 const onSubmitContact = async (event) => {
   event.preventDefault();
-  console.log('onSubmitContact: ', contactData);
   let response = null;
   if (editMode) {
     response = await updateContactFromApi(contactData);

@@ -36,7 +36,6 @@ export default defineStore('empresa', {
       this.anotaciones.push(anotacion);
     },
     updateEmpresa(objeto) {
-      console.log(objeto);
       const {
         empresa, contactos, puestos,
       } = objeto;
@@ -69,7 +68,6 @@ export default defineStore('empresa', {
       this.selectedContact = this.contactos.find((contacto) => contacto.n === n);
     },
     setSelectedAnnotation(n) {
-      console.log('buscando anotacion con codigo: ', n);
       this.selectedAnnotation = this.anotaciones.find((anotacion) => anotacion.codigo === n);
     },
   },

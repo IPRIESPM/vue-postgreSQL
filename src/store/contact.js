@@ -38,7 +38,6 @@ export default defineStore('contact', {
       this.contacts = contacts;
     },
     setContact(contact) {
-      console.log('Contact', contact);
       this.name = contact.nombre;
       this.email = contact.correo;
       this.phone = contact.telefono;

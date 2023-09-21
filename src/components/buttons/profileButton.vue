@@ -38,7 +38,6 @@ const showOptions = () => {
 
 const destroyCookie = () => {
   Cookie.remove('token');
-  console.log('Cookie destroyed');
   router.push({ name: 'home' });
 };
 
@@ -49,23 +48,19 @@ onMounted(async () => {
 });
 
 const navigateTo = (route) => {
-  console.log(route);
   router.push({ name: route });
 };
 
 const savedTheme = ref('light');
 
 const changeColorScheme = () => {
-  console.log('changeColorScheme');
   const colorScheme = document.querySelector('html[data-theme]');
-  console.log('colorScheme', colorScheme.getAttribute('data-theme'));
   const colorSchemeValue = colorScheme.getAttribute('data-theme');
 
   if (colorSchemeValue === 'dark') {
     colorScheme.setAttribute('data-theme', 'light');
     savedTheme.value = 'light';
   } else {
-    console.log('light');
     colorScheme.setAttribute('data-theme', 'dark');
     savedTheme.value = 'dark';
   }

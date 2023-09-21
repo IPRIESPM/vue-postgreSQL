@@ -59,17 +59,12 @@ const buttonModal = () => {
 
 const onSubmit = async (event) => {
   event.preventDefault();
-  console.log('Enviando anotacion...');
   loading.value = true;
   selectedAnnotationData.value.contactoN = contactSelected.value;
   let response;
   if (editMode.value) {
-    console.log('editando anotacion');
-    console.log('anotacion', selectedAnnotationData.value.cod);
     response = await updateAnnotationFromApi(selectedAnnotationData.value);
   } else {
-    console.log('añadiendo anotacion');
-    console.log(selectedAnnotationData.value);
     response = await newAnnotation(selectedAnnotationData.value);
   }
 
@@ -91,7 +86,6 @@ onMounted(async () => {
   loading.value = false;
   contactSelected.value = companyStored.selectedContact.contacto_n;
   selectedAnnotationData.value = annotationStored.getAnnotation;
-  console.log('selectedAnnotationData', selectedAnnotationData.value);
   editMode.value = modalStored.getEditMode;
 });
 

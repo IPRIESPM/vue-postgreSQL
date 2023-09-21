@@ -85,7 +85,6 @@ export async function updateContactFromApi(data) {
   const url = serverPath;
 
   try {
-    console.log('Mandando datos', data);
     const response = await fetch(url, {
       method: 'PUT',
       body: JSON.stringify({
@@ -110,7 +109,6 @@ export async function updateContactFromApi(data) {
     }
 
     const responseData = await response.json();
-    console.log('Respuesta', responseData);
     return responseData;
   } catch (error) {
     return false;

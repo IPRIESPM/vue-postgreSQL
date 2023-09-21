@@ -6,7 +6,6 @@ import logoSvg from '../assets/svg/Logo.svg';
 const router = useRouter();
 
 const navigateTo = (route) => {
-  console.log(route);
   router.push({ name: route });
 };
 

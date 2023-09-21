@@ -11,12 +11,9 @@ const modal = ref(false);
 const annotationSelected = ref(null);
 
 const showAnnotation = (id) => {
-  console.log(id);
   lastAnnotation.value.forEach((annotation) => {
     if (annotation.codigo === id) {
-      console.log('found');
       annotationSelected.value = annotation;
-      console.log(annotationSelected.value);
       modal.value = true;
     }
   });
@@ -25,7 +22,6 @@ const closeAnnotation = () => {
   modal.value = false;
 };
 onMounted(async () => {
-  console.log('LastAnnotations mounted');
   loading.value = true;
   lastAnnotation.value = await getLastAnnotationFromApi();
   loading.value = false;
@@ -103,8 +99,10 @@ onMounted(async () => {
             {{ annotation.verificado ? "Confirmado" : "No confirmado" }}
           </td>
           <td class="icons" @click="showAnnotation(annotation.codigo)">
-            <font-awesome-icon :icon="['fas', 'eye']" />
-            Ver comentario
+            <a class="icon">
+              <font-awesome-icon :icon="['fas', 'eye']" />
+              Ver comentario
+            </a>
           </td>
         </tr>
       </tbody>
@@ -293,7 +291,9 @@ section.editZone {
 .bounce {
   animation: bounce 0.5s 1 linear forwards;
 }
-
+a.icon {
+  cursor: pointer;
+}
 section.modal{
   section.modal-main{
     width: 50%;
@@ -308,6 +308,7 @@ section.modal{
       gap: 1rem;
     }
   }
+
 }
 
 </style>

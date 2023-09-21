@@ -27,7 +27,6 @@ export async function getAllData(section, force = false) {
   const minutes = Math.floor(diff / 1000 / 60);
 
   if (minutes < 5 && !force && !update) return localData;
-  if (force) console.log('update forced');
 
   let data;
   if (section === 'teachers') data = await getAllTeachersFromApi(version);
@@ -45,12 +44,10 @@ export async function editData(section, newData) {
 
   if (section === 'companys') apiResponse = await updateCompanyFromApi(newData);
   if (section === 'teachers') apiResponse = await updateTeacherFromApi(newData);
-  console.log('apiResponse', apiResponse);
+
   if (!apiResponse) {
-    console.log('error al guardar los datos');
     return false;
   }
-  console.log('apiResponse', apiResponse);
   updateLocalData(section, newData);
   return true;
 }
@@ -61,10 +58,7 @@ export async function deleteData(section, data) {
   if (section === 'companys') apiResponse = await deleteCompanyFromApi(data);
   if (section === 'teachers') apiResponse = await deleteTeacherFromApi(data);
 
-  if (!apiResponse) {
-    console.log('error al guardar los datos');
-    return false;
-  }
+  if (!apiResponse) return false;
   deleteLocalData(section, data);
   return true;
 }

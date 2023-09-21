@@ -3,7 +3,6 @@ import userStore from './user';
 import companyStore from './empresas';
 
 export function getLocalData(params) {
-  console.log('getLocalData', params);
   const profesoresStored = profesoresStore();
   const userStored = userStore();
   const companyStored = companyStore();

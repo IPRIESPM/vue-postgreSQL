@@ -194,7 +194,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getAllData, editData, deleteData } from '../../controllers/data';
 import { newCompany } from '../../controllers/api/companys';
-import submitButton from '../submitButton.vue';
+import submitButton from '../buttons/submitButton.vue';
 import profesoresStore from '../../store/profesores';
 import companyStore from '../../store/empresas';
 import userStore from '../../store/user';

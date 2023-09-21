@@ -60,16 +60,12 @@ const onSubmit = async (event) => {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
     if (!data.dni || !data.contrasena) throw new Error('Faltan datos en el formulario.');
-
     const loginData = await login(data);
-    console.log(loginData, 'loginData');
     await Cookies.set('token', loginData.token, { expires: 7 });
     storedUser.setUser(loginData.user);
-    console.log('storedUser', storedUser.getUser);
     router.push({ name: 'dashboard' });
   } catch (error) {
     if (error.message.includes('401 Unauthorized')) {
-      console.log('Usuario o contraseña incorrectos.');
       formInputs.forEach((input) => {
         input.setCustomValidity('Usuario o contraseña incorrectos.');
       });

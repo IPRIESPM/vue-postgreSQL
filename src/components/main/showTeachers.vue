@@ -213,7 +213,6 @@ function editFormData(id) {
 }
 
 async function deleteFormData(id) {
-  console.log('Eliminando: ', id);
   loading.value = true;
   await deleteData('teachers', id);
   await updateData();
@@ -257,7 +256,6 @@ const onChange = (event) => {
 };
 
 const onSubmit = async (event) => {
-  console.log(dataSelected.value.dni, dataSelected.value.nombre, dataSelected.value.contrasena);
   event.preventDefault();
   submitError.value = false;
   submitLoading.value = true;

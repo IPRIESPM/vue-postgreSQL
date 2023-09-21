@@ -105,7 +105,6 @@ const onSubmit = async (event) => {
   const data = Object.fromEntries(formData.entries());
 
   const responseData = await editData('teachers', data);
-  console.log('esto tengo de la api', responseData);
   if (!responseData) {
     event.target.classList.add('bounce');
     errorMessage.value = 'Error al Actualizar tu perfil';

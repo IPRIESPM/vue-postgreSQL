@@ -30,9 +30,6 @@ export default defineStore('annotations', {
   actions: {
     selectAnnotation(cod) {
       const index = this.annotations.findIndex((cont) => cont.codigo === cod);
-      console.log('Index', index);
-      console.log('Annotations', this.annotations[index]);
-
       this.setAnnotation(this.annotations[index]);
     },
     setAnnotations(annotations) {
@@ -47,7 +44,6 @@ export default defineStore('annotations', {
       this.type = annotation.tipo;
       this.confirmed = annotation.confirmado;
       this.annotation = annotation.anotacion;
-      console.log('Annotation', annotation);
     },
     addAnnotation(annotation) {
       this.annotations.push(annotation);
